@@ -21,10 +21,13 @@
     "vite": "^5.1.4"
   },
   "dependencies": {
+    "apexcharts": "^3.49.0",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.0.0",
     "face-api.js": "^0.22.2",
     "html5-qrcode": "^2.3.8",
+    "qrcode": "^1.5.3",
+    "qs": "^6.12.1",
     "svelte-spa-router": "^4.0.1",
     "tailwind-merge": "^2.2.1"
   }

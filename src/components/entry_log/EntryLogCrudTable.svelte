@@ -9,19 +9,19 @@
     TableHeadCell,
   } from "flowbite-svelte";
   import { createEventDispatcher } from "svelte";
-  import VisitorService from "../../services/VisitorService";
   import AsyncText from "../AsyncText.svelte";
+  import MemberService from "../../services/MemberService";
 
   const dispatch = createEventDispatcher();
   export let columns;
   export let asyncItems;
   let items;
-  let visitorService = new VisitorService();
+  let memberService = new MemberService();
 
-  const getVisitorFullName = async (id) => {
-    let visitor = await visitorService.get(id);
+  const getMemberFullName = async (id) => {
+    let member = await memberService.get(id);
 
-    return `${visitor.first_name} ${visitor.last_name}`;
+    return `${member.first_name} ${member.last_name}`;
   }
 
   $: asyncItems.then(async (fetchedItems) => {
@@ -57,9 +57,9 @@
       {#each items as item}
         <TableBodyRow>
           {#each columns as column}
-            {#if column == "visitor_id"}
+            {#if column == "member_id"}
               <TableBodyCell class="font-thin">
-                <AsyncText promise={getVisitorFullName(item[column])} />
+                <AsyncText promise={getMemberFullName(item[column])} />
               </TableBodyCell>
             {:else}
               <TableBodyCell class="font-thin">

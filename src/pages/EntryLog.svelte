@@ -29,14 +29,14 @@
   let previous = null;
   let intervalId = null;
   let imageData = null;
-  let columns = ["visitor_id", "dt_logged"];
+  let columns = ["member_id", "dt_logged"];
   let status = {
     state: "idle",
     data: null,
   };
-  let service = new EntryLogService();
+  let entryLogService = new EntryLogService();
 
-  let asyncItems = service.getAll();
+  let asyncItems = entryLogService.getAll();
 
   const startWebcam = () => {
     navigator.mediaDevices
@@ -104,15 +104,15 @@
           formData.set("base64_file", imageData);
           status.state = "processing";
           try {
-            let item = await service.findFace(formData);
+            let item = await entryLogService.findFace(formData);
             status.state = "success";
             status.data = item;
 
-            if (previous?.visitor.id != item?.visitor.id) {
+            if (previous?.member.id != item?.member.id) {
               previous = item;
-              formData.set("visitor_id", item.visitor.id);
-              let logged = await service.add(formData);
-              asyncItems = service.getAll();
+              formData.set("member_id", item.member.id);
+              let logged = await entryLogService.add(formData);
+              asyncItems = entryLogService.getAll();
             }
           } catch (e) {
             status.state = "error";
@@ -150,55 +150,57 @@
     class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
   >
     <Breadcrumb {crumbs} />
-    <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">Entry Logger</Heading>
-    <div class="flex">
-      <div class="px-5 flex flex-col w-full dark:text-white">
-        <div class="overflow-y-scroll max-h-96">
-          <EntryLogCrudTable {asyncItems} {columns} />
-        </div>
-      </div>
-      <div style="min-width: 360px;">
-        <div>
-          <!-- svelte-ignore a11y-media-has-caption -->
-          <section id="video-container" class="relative">
-            <video bind:this={video} width="360" height="270" autoplay></video>
-          </section>
-          <canvas id="hidden-canvas" class="hidden"></canvas>
-        </div>
-        {#if imageData && status.state != "idle"}
-          <div class="flex mb-3">
-            <!-- <img src={imageData} alt="base64 data" style="height: 75px;" /> -->
-            {#if status.state == "processing"}
-              <div class="text-center w-full pt-2">
-                <Alert color="yellow">
-                  <Spinner size={4} class="mx-2" />
-                  Searching for a face match in the database...
-                </Alert>
-              </div>
-            {/if}
-            {#if status.state == "success"}
-              <div class="w-full pt-2 text-center">
-                <Alert color="green">
-                  <CheckCircleOutline class="inline-block" />
-                  A face match was found for
-                  <br />{status.data.visitor.type.toLowerCase()}:
-                  {status.data.visitor.first_name}
-                  {status.data.visitor.last_name}.
-                </Alert>
-              </div>
-            {/if}
-            {#if status.state == "error"}
-              <div class="w-full pt-2 text-center">
-                <Alert color="red">
-                  <ExclamationCircleOutline class="inline-block" />
-                  {status.message}
-                </Alert>
-              </div>
-            {/if}
+    <div class="p-3">
+      <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">Entry Logger</Heading>
+      <div class="flex">
+        <div class="pe-5 flex flex-col w-full dark:text-white">
+          <div class="overflow-y-scroll max-h-96">
+            <EntryLogCrudTable {asyncItems} {columns} />
           </div>
-        {:else}
-          <div style="height: 75px;" class="mb-3"></div>
-        {/if}
+        </div>
+        <div style="min-width: 360px;">
+          <div>
+            <!-- svelte-ignore a11y-media-has-caption -->
+            <section id="video-container" class="relative">
+              <video bind:this={video} width="360" height="270" autoplay></video>
+            </section>
+            <canvas id="hidden-canvas" class="hidden"></canvas>
+          </div>
+          {#if imageData && status.state != "idle"}
+            <div class="flex mb-3">
+              <!-- <img src={imageData} alt="base64 data" style="height: 75px;" /> -->
+              {#if status.state == "processing"}
+                <div class="text-center w-full pt-2">
+                  <Alert color="yellow">
+                    <Spinner size={4} class="mx-2" />
+                    Searching for a face match in the database...
+                  </Alert>
+                </div>
+              {/if}
+              {#if status.state == "success"}
+                <div class="w-full pt-2 text-center">
+                  <Alert color="green">
+                    <CheckCircleOutline class="inline-block" />
+                    A face match was found for
+                    <br />{status.data.member.type.toLowerCase()}:
+                    {status.data.member.first_name}
+                    {status.data.member.last_name}.
+                  </Alert>
+                </div>
+              {/if}
+              {#if status.state == "error"}
+                <div class="w-full pt-2 text-center">
+                  <Alert color="red">
+                    <ExclamationCircleOutline class="inline-block" />
+                    {status.message}
+                  </Alert>
+                </div>
+              {/if}
+            </div>
+          {:else}
+            <div style="height: 75px;" class="mb-3"></div>
+          {/if}
+        </div>
       </div>
     </div>
   </main>

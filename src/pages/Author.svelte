@@ -6,8 +6,12 @@
 
   let crumbs = [
     {
-      href: '#/author',
-      title: 'Author',
+      href: '#/records',
+      title: 'Records',
+    },
+    {
+      href: '#/records/authors',
+      title: 'Authors',
     },
   ];
 </script>
@@ -17,7 +21,9 @@
     class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
   >
     <Breadcrumb {crumbs} />
-    <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">All authors</Heading>
-    <AuthorPageContent />
+    <div class="p-3">
+      <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">All authors</Heading>
+      <AuthorPageContent />
+    </div>
   </main>
 </Layout>

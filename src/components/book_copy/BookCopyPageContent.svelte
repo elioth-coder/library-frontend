@@ -8,7 +8,7 @@
   import FormContainerModal from "../FormContainerModal.svelte";
 
   let table_name = "book_copy";
-  let columns = ["id", "barcode", "book_id", "status"];
+  let columns = ["id", "barcode", "book_id", "price", "status"];
   let service = new BookCopyService();
   let modalSize = "md";
 
@@ -98,7 +98,7 @@
 
   const handleSearch = async (e) => {
     let query = e.detail;
-    asyncItems = service.search("barcode", query);
+    asyncItems = service.search(query);
   };
 
   const submitForm = () => {

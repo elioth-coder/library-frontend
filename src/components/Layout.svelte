@@ -14,7 +14,7 @@
       user = await userService.me();
     } catch (e) {
       alert(e.message);
-      replace("/authentication/sign-in");
+      replace("/sign-in");
     }
   });
 </script>

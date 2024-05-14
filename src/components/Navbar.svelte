@@ -1,5 +1,5 @@
 <script>
-	import AppsMenu from './AppsMenu.svelte';
+	// import AppsMenu from './AppsMenu.svelte';
 	import UserMenu from './UserMenu.svelte';
 	import { DarkMode, NavBrand, NavHamburger, Navbar } from 'flowbite-svelte';
 
@@ -23,7 +23,7 @@
 	</div>
 
 	<div class="ms-auto flex items-center gap-2 p-1">
-		<AppsMenu />
+		<!-- <AppsMenu /> -->
 		<DarkMode />
 		<UserMenu />
 	</div>

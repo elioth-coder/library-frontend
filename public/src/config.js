@@ -1,4 +1,4 @@
 const CONFIG = {
-    HOST: 'http://localhost:3000',
-    API : 'http://localhost:3000/api',
+    HOST: 'http://localhost:4000',
+    API : 'http://localhost:4000/api',
 }

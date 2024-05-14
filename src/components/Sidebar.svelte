@@ -16,6 +16,8 @@
     UserEditSolid,
     PieChartSolid,
     AddressBookOutline,
+    RectangleListSolid,
+    UsersGroupSolid,
   } from "flowbite-svelte-icons";
   import { location, replace } from "svelte-spa-router";
   import UserService from "../services/UserService";
@@ -36,25 +38,25 @@
 
   let posts = [
     { name: "Dashboard", icon: PieChartSolid, href: "#/" },
-    { name: "Entry Log", icon: AddressBookOutline, href: "#/entry_log" },
-    { name: "Publisher", icon: BuildingSolid, href: "#/publisher" },
-    { name: "Author", icon: UserEditSolid, href: "#/author" },
+    { name: "Entry Logger", icon: AddressBookOutline, href: "#/entry_log" },
     {
-      name: "Book",
-      icon: BookSolid,
+      name: "List of Book",
+      icon: StackoverflowSolid,
       children: {
-        Record: "#/book/record",
         Copy: "#/book/copy",
         Borrow: "#/book/borrow",
         Return: "#/book/return",
       },
     },
-    {
-      name: "Library",
-      icon: StackoverflowSolid,
+    { name: "Membership", icon: UsersGroupSolid, href: "#/members" },
+    { 
+      name: "Basic Records", 
+      icon: RectangleListSolid,  
       children: {
-        Card: "#/library/card",
-        Visitor: "#/library/visitor",
+        Dashboard: "#/records",
+        Books: "#/records/books",
+        Publishers: "#/records/publishers",
+        Authors: "#/records/authors",
       },
     },
   ];
@@ -68,7 +70,7 @@
     if (continue_logout) {
       try {
         await userService.logout();
-        return replace("/authentication/sign-in");
+        return replace("/sign-in");
       } catch (e) {
         alert("Failed to log out.");
       }
