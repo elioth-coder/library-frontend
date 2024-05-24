@@ -10,7 +10,6 @@
     TableHead,
     TableHeadCell,
   } from "flowbite-svelte";
-  import { push } from "svelte-spa-router";
   import { EditOutline, TrashBinSolid, UsersOutline } from "flowbite-svelte-icons";
   import { createEventDispatcher } from "svelte";
 
@@ -57,7 +56,7 @@
           <TableBodyCell class="px-0 space-x-2 text-center">
             <Button
               title="Authors"
-              on:click={() => push(`/book/${item.id}/author`,)}
+              href={`#/records/books/${item.id}/author`}
               size="sm"
               color="green"
               class="gap-2"

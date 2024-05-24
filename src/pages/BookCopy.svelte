@@ -5,12 +5,12 @@
   import BookCopyPageContent from "../components/book_copy/BookCopyPageContent.svelte";
   let crumbs = [
     {
-      href: "#/book/record",
-      title: "Book",
+      href: "#/books",
+      title: "List of Books",
     },
     {
-      href: "#/book/copy",
-      title: "Copy",
+      href: "#/books/copies",
+      title: "Copies",
     },
   ];
 </script>
@@ -21,7 +21,7 @@
   >
     <Breadcrumb {crumbs} />
     <div class="p-3">
-      <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">All book copies</Heading>
+      <Heading tag="h4" class="text-center">Copies of Books</Heading>
       <BookCopyPageContent />
     </div>
   </main>

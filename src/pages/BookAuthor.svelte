@@ -9,11 +9,15 @@
   let id = params.id;
   let crumbs = [
     {
-      href: "#/book/record",
-      title: "Book",
+      href: "#/records",
+      title: "Records",
     },
     {
-      href: `#/book/${id}/author`,
+      href: "#/records/books",
+      title: "Books",
+    },
+    {
+      href: `#/records/books/${id}/author`,
       title: "Author",
     },
   ];

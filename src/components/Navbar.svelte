@@ -17,7 +17,7 @@
 				alt="Stacked books"
 			/>
 			<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl">
-				Library Management
+				NEUST Library Management
 			</span>
 		</NavBrand>
 	</div>

@@ -21,8 +21,8 @@
     class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
   >
     <Breadcrumb {crumbs} />
-    <div class="p-3">
-      <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">All authors</Heading>
+    <div class="px-3">
+      <Heading tag="h4" class="text-center">Book Authors</Heading>
       <AuthorPageContent />
     </div>
   </main>

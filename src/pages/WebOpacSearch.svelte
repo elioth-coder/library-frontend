@@ -16,7 +16,7 @@
   import { PlusOutline, TrashBinOutline } from "flowbite-svelte-icons";
   import CartItemsModal from "../components/web_opac/CartItemsModal.svelte";
   import QrModal from "../components/web_opac/QrModal.svelte";
-  import cart_items from '../stores/CartItems';
+  import cart_items from '../stores/CurrentUserStore';
 
   let userService = new UserService();
   let bookService = new BookService();

@@ -1,8 +1,8 @@
 <script>
-  import Layout from "../components/Layout.svelte";
-  import Breadcrumb from "../components/Breadcrumb.svelte";
-  import BookPageContent from "../components/book/BookPageContent.svelte";
+  import Layout from "../Layout.svelte";
+  import Breadcrumb from "../Breadcrumb.svelte";
   import { Heading } from "flowbite-svelte";
+  import CampusPageContent from "../campus/CampusPageContent.svelte";
 
   let crumbs = [
     {
@@ -10,8 +10,8 @@
       title: "Records",
     },
     {
-      href: "#/records/books",
-      title: "Books",
+      href: "#/records/campuses",
+      title: "Campuses",
     },
   ];
 </script>
@@ -22,8 +22,8 @@
   >
     <Breadcrumb {crumbs} />
     <div class="px-3">
-      <Heading tag="h4" class="text-center">Book Titles</Heading>
-      <BookPageContent />
+      <Heading tag="h4" class="text-center">Campuses</Heading>
+      <CampusPageContent />
     </div>
   </main>
 </Layout>

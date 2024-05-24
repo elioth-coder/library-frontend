@@ -44,8 +44,9 @@
     formData.delete('password');
 
     try {
-      let member = await memberService.add(formData);
       let user   = await userService.add(userFormData);
+      formData.set('user_id', user.id);
+      let member = await memberService.add(formData);
 
       message = {
         type: 'success',

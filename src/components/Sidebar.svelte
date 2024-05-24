@@ -10,23 +10,28 @@
     AngleDownOutline,
     AngleUpOutline,
     ArrowRightToBracketOutline,
-    BookSolid,
     StackoverflowSolid,
-    BuildingSolid,
-    UserEditSolid,
     PieChartSolid,
-    AddressBookOutline,
     RectangleListSolid,
     UsersGroupSolid,
+    ArrowUpDownOutline,
+    FileChartBarSolid,
+    ArrowDownToBracketOutline,
+    ArrowUpRightFromSquareOutline,
+    HeartOutline,
+    CogOutline,
+    CodeSolid,
+    DrawSquareOutline,
   } from "flowbite-svelte-icons";
   import { location, replace } from "svelte-spa-router";
   import UserService from "../services/UserService";
+  import currentUser from "../stores/CurrentUserStore";
 
   let drawerHidden: boolean = false;
 
-  let spanClass = "ms-9";
+  let spanClass = "ms-9 truncate";
   let childClass =
-    "p-2 hover:bg-gray-100 text-gray-500 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 relative flex items-center flex-wrap font-medium";
+    "truncate p-2 hover:bg-gray-100 text-gray-500 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 relative flex items-center flex-wrap font-medium";
 
   let nonActiveClass =
     childClass +
@@ -36,30 +41,74 @@
   $: mainSidebarUrl = $location;
   $: activeMainSidebar = "#" + $location;
 
+  let links = [
+    { name: "Dashboard", icon: PieChartSolid, href: "#/" },
+    { name: "Borrowed", icon: ArrowUpRightFromSquareOutline, href: "#/student/borrowed" },
+    { name: "Returned", icon: ArrowDownToBracketOutline, href: "#/student/returned" },
+    { name: "On Wishlist", icon: HeartOutline, href: "#/student/wishlist" },
+  ];
+
   let posts = [
     { name: "Dashboard", icon: PieChartSolid, href: "#/" },
-    { name: "Entry Logger", icon: AddressBookOutline, href: "#/entry_log" },
     {
-      name: "List of Book",
-      icon: StackoverflowSolid,
+      name: "Borrow / Return",
+      icon: ArrowUpDownOutline,
+      href: "#/transact",
       children: {
-        Copy: "#/book/copy",
-        Borrow: "#/book/borrow",
-        Return: "#/book/return",
+        Borrow: "#/transact/borrow",
+        Return: "#/transact/return",
       },
     },
-    { name: "Membership", icon: UsersGroupSolid, href: "#/members" },
-    { 
-      name: "Basic Records", 
-      icon: RectangleListSolid,  
+    {
+      name: "List of Books",
+      icon: StackoverflowSolid,
+      href: "#/books",
       children: {
-        Dashboard: "#/records",
+        Copies: "#/books/copies",
+        Borrowed: "#/books/borrowed",
+        "On Reserve": "#/books/reserved",
+        "On Wishlist": "#/books/wishlist",
+      },
+    },
+    {
+      name: "List of Members",
+      icon: UsersGroupSolid,
+      href: "#/members",
+      children: {
+        Pending: "#/members/pending",
+        Approved: "#/members/approved",
+        Rejected: "#/members/rejected",
+      },
+    },
+    {
+      name: "List of Records",
+      icon: RectangleListSolid,
+      href: "#/records",
+      children: {
         Books: "#/records/books",
         Publishers: "#/records/publishers",
         Authors: "#/records/authors",
+        Campuses: "#/records/campuses",
       },
     },
+    {
+      name: "Reports",
+      icon: FileChartBarSolid,
+      href: "#/reports",
+      children: {
+        "Inventory of Books": "#/reports/books_inventory",
+        "Available Books": "#/reports/books_available",
+        "Borrowed Books": "#/reports/books_borrowed",
+      },
+    },
+    { name: "Entry Logger", icon: DrawSquareOutline, href: "#/entry_logger" },
+    {
+      name: "Settings",
+      icon: CogOutline,
+      href: "#/settings",
+    },  
   ];
+
   let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
   let userService = new UserService();
 
@@ -86,45 +135,12 @@
   asideClass="fixed inset-0 z-30 flex-none h-full w-64 lg:h-auto border-e border-gray-200 dark:border-gray-600 lg:overflow-y-visible lg:pt-20 lg:-mt-2 lg:block"
 >
   <SidebarWrapper
-    divClass="overflow-y-auto px-4 pt-20 lg:pt-4 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-4.5rem)] lg:block dark:bg-gray-800 lg:me-0 lg:sticky top-2"
+    divClass="overflow-y-auto px-3 pt-20 lg:pt-4 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-4.5rem)] lg:block dark:bg-gray-800 lg:me-0 lg:sticky top-2"
   >
     <nav class="divide-y text-base font-medium">
-      <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
-        {#each posts as { name, icon, children, href } (name)}
-          {#if children}
-            <SidebarDropdownWrapper
-              isOpen={activeMainSidebar.indexOf(name.toLowerCase()) >= 0}
-              label={name}
-              ulClass="mt-0.5"
-              btnClass="flex p-2 rounded-lg items-center justify-start gap-4 w-full text-base font-medium tracking-wide hover:text-primary-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-              spanClass=""
-              class={dropdowns[name]
-                ? "text-primary-700 dark:text-white"
-                : "text-gray-500 dark:text-gray-400"}
-            >
-              <AngleDownOutline
-                slot="arrowdown"
-                class="ms-auto text-gray-800 dark:text-white"
-              />
-              <AngleUpOutline
-                slot="arrowup"
-                class="ms-auto text-gray-800 dark:text-white"
-              />
-              <svelte:component this={icon} slot="icon" />
-              {#each Object.entries(children) as [title, href]}
-                <SidebarItem
-                  label={title}
-                  {href}
-                  {spanClass}
-                  {activeClass}
-                  class={activeMainSidebar == href
-                    ? "text-primary-700 dark:text-primary-700"
-                    : ""}
-                  active={activeMainSidebar.indexOf(title.toLowerCase()) >= 0}
-                />
-              {/each}
-            </SidebarDropdownWrapper>
-          {:else}
+      {#if $currentUser?.role != "Admin"}
+        <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
+          {#each links as { name, icon, href } (name)}
             <SidebarItem
               label={name}
               {href}
@@ -134,9 +150,59 @@
             >
               <svelte:component this={icon} slot="icon" />
             </SidebarItem>
-          {/if}
-        {/each}
-      </SidebarGroup>
+          {/each}
+
+        </SidebarGroup>
+      {:else}
+        <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
+          {#each posts as { name, icon, children, href } (name)}
+            {#if children}
+              <SidebarDropdownWrapper
+                isOpen={activeMainSidebar.indexOf(href?.toLowerCase()) >= 0}
+                label={name}
+                ulClass="mt-0.5"
+                btnClass="flex p-2 rounded-lg items-center justify-start gap-4 w-full text-base font-medium tracking-wide hover:text-primary-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                spanClass="truncate"
+                class={dropdowns[name]
+                  ? "text-primary-700 dark:text-white"
+                  : "text-gray-500 dark:text-gray-400"}
+              >
+                <AngleDownOutline
+                  slot="arrowdown"
+                  class="ms-auto text-gray-800 dark:text-white"
+                />
+                <AngleUpOutline
+                  slot="arrowup"
+                  class="ms-auto text-gray-800 dark:text-white"
+                />
+                <svelte:component this={icon} slot="icon" />
+                {#each Object.entries(children) as [title, href]}
+                  <SidebarItem
+                    label={title}
+                    {href}
+                    {spanClass}
+                    {activeClass}
+                    class={activeMainSidebar == href
+                      ? "text-primary-700 dark:text-primary-700"
+                      : ""}
+                    active={activeMainSidebar.indexOf(title.toLowerCase()) >= 0}
+                  />
+                {/each}
+              </SidebarDropdownWrapper>
+            {:else}
+              <SidebarItem
+                label={name}
+                {href}
+                class={activeMainSidebar == href
+                  ? "text-primary-700 dark:text-primary-700"
+                  : ""}
+              >
+                <svelte:component this={icon} slot="icon" />
+              </SidebarItem>
+            {/if}
+          {/each}
+        </SidebarGroup>
+      {/if}
       <SidebarGroup ulClass="list-unstyled fw-normal small pt-4 space-y-2">
         <SidebarItem label="Log out" on:click={handleLogout}>
           <ArrowRightToBracketOutline slot="icon" />

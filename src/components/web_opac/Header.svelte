@@ -1,7 +1,7 @@
 <script>
   import { Button, DarkMode, NavBrand, Navbar } from "flowbite-svelte";
   import { CartSolid } from "flowbite-svelte-icons";
-  import cart_items from "../../stores/CartItems";
+  import cart_items from "../../stores/CurrentUserStore";
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();

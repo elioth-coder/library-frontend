@@ -1,0 +1,103 @@
+<script>
+    import Layout from "../components/Layout.svelte";
+    import Breadcrumb from "../components/Breadcrumb.svelte";
+    import {
+      Heading,
+      TableBody,
+      TableBodyCell,
+      TableBodyRow,
+      TableHead,
+      TableHeadCell,
+      TableSearch,
+    } from "flowbite-svelte";
+    import { onMount } from "svelte";
+    import ReportService from "../services/ReportService";
+  
+    let crumbs = [
+      {
+        href: "#/reports",
+        title: "Reports",
+      },
+      {
+        href: "#/books_inventory",
+        title: "Inventory of Books",
+      },
+    ];
+    let reportService = new ReportService();
+    let items = [];
+    let asyncItems;
+  
+    let searchTerm;
+    $: filteredItems = items.filter((item) => {
+      return item.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 || 
+        item.isbn.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+    })
+
+    onMount(async () => {
+      asyncItems = reportService.booksInventory();
+      items = await asyncItems;
+    });
+  </script>
+  
+  <Layout>
+    <main
+      class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
+    >
+      <Breadcrumb {crumbs} />
+      <div class="px-3">
+        <Heading tag="h4" class="text-center mb-4">Inventory of Books</Heading>
+        <TableSearch 
+          hoverable={true}
+          placeholder="Search book details"
+          bind:inputValue={searchTerm}
+        >
+          <TableHead>
+            <TableHeadCell>ISBN</TableHeadCell>
+            <TableHeadCell>Title</TableHeadCell>
+            <TableHeadCell class="text-right">Available</TableHeadCell>
+            <TableHeadCell class="text-right">Borrowed</TableHeadCell>
+            <TableHeadCell class="text-right">Damaged</TableHeadCell>
+            <TableHeadCell class="text-right">Lost</TableHeadCell>
+            <TableHeadCell class="text-right">Total</TableHeadCell>
+          </TableHead>
+          <TableBody tableBodyClass="divide-y">
+            {#await asyncItems}
+              <TableBodyRow>
+                <TableBodyCell colspan={6} class="text-center">Generating report...</TableBodyCell>
+              </TableBodyRow>
+            {/await}
+            {#each filteredItems as item}
+              <TableBodyRow>
+                <TableBodyCell>{item.isbn}</TableBodyCell>
+                <TableBodyCell>{item.title}</TableBodyCell>
+                <TableBodyCell class="text-center">{item.available}</TableBodyCell>
+                <TableBodyCell class="text-center">{item.borrowed}</TableBodyCell>
+                <TableBodyCell class="text-center">{item.damaged}</TableBodyCell>
+                <TableBodyCell class="text-center">{item.lost}</TableBodyCell>
+                {@const total = item.available + item.borrowed + item.damaged + item.lost}
+                <TableBodyCell class="text-center font-semibold text-gray-900">{total}</TableBodyCell>
+              </TableBodyRow>
+            {/each}
+          </TableBody>
+          {#if filteredItems}
+          {@const availableTotal = filteredItems.reduce((prev, current)=> prev += current.available, 0)}
+          {@const borrowedTotal  = filteredItems.reduce((prev, current)=> prev += current.borrowed, 0)}
+          {@const damagedTotal   = filteredItems.reduce((prev, current)=> prev += current.damaged, 0)}
+          {@const lostTotal      = filteredItems.reduce((prev, current)=> prev += current.lost, 0)}
+          {@const overallTotal   = availableTotal + borrowedTotal + damagedTotal + lostTotal}
+          <tfoot>
+            <tr class="font-semibold text-gray-900 dark:text-white">
+              <th scope="row" colspan={2} class="py-3 px-6 text-base">Total</th>
+              <td class="py-3 px-6 text-center">{availableTotal}</td>
+              <td class="py-3 px-6 text-center">{borrowedTotal}</td>
+              <td class="py-3 px-6 text-center">{damagedTotal}</td>
+              <td class="py-3 px-6 text-center">{lostTotal}</td>
+              <td class="py-3 px-6 text-center">{overallTotal}</td>
+            </tr>
+          </tfoot>
+          {/if}
+        </TableSearch>
+      </div>
+    </main>
+  </Layout>
+  

@@ -2,11 +2,12 @@
   import Layout from "../components/Layout.svelte";
   import Breadcrumb from "../components/Breadcrumb.svelte";
   import {
+  Avatar,
     Button,
     Card,
     Checkbox,
     Input,
-    Modal,
+    Label,
     Spinner,
     Table,
     TableBody,
@@ -24,6 +25,10 @@
   import { addDays, format } from "date-fns";
   import MemberService from "../services/MemberService";
   import WishlistService from "../services/WishlistService";
+  import SettingService from "../services/SettingService";
+  import { onMount } from "svelte";
+  import { uniq } from "lodash-es";
+  import MessageModal from "../components/MessageModal.svelte";
 
   let bookCopyService = new BookCopyService();
   let bookService = new BookService();
@@ -32,44 +37,30 @@
   let borrowedService = new BorrowedService();
   let reserveService = new ReserveService();
   let wishlistService = new WishlistService();
-  let openWebcam = false;
-  let openBarcode = false;
+  let settingService = new SettingService();
+  let message = null;
+  let { HOST } = CONFIG;
   let crumbs = [
     {
-      href: "#/book/record",
-      title: "Book",
+      href: "#/transact",
+      title: "Transact",
     },
     {
-      href: "#/book/borrow",
+      href: "#/transact/borrow",
       title: "Borrow",
     },
   ];
+
+  const handleMessageClose = () => {
+    message = null;
+  }
 
   let borrower = null;
   let to_borrow_books = [];
   let selected_books = [];
   let reserved_books = [];
   let processing = false;
-
-  const startBarcodeCardScanner = () => {
-    openBarcode = true;
-    setTimeout(() => {
-      // @ts-ignore
-      document.querySelector('#barcode_card_scanner').focus();
-    }, 100);
-  }
-
-  const stopBarcodeCardScanner = () => {
-    openBarcode = false;
-  }
-
-  const stopCardScanner = () => {
-    stopBarcodeCardScanner();
-  }
-
-  const startCardScanner = () => {
-    startBarcodeCardScanner();
-  }
+  let borrow_duration = 0;
 
   const handleCardBarcodeKeyup = async (event) => {
     if (event.key === "Enter") {
@@ -77,14 +68,18 @@
       event.target.value = "";
       let member = await memberService.getOne("card_number", card_barcode);
 
-      if(!member) {
-        return alert(`Card number ${card_barcode} not found!`);
+      if (!member) {
+        message = {
+          text: `Card number ${card_barcode} not found!`,
+          type: 'error',
+        };
+        
+        return;
       }
 
-      borrower = {...member};
-      stopBarcodeCardScanner();
+      borrower = { ...member };
     }
-  }
+  };
 
   const handleBookBarcodeKeyup = async (event) => {
     if (event.key === "Enter") {
@@ -92,17 +87,17 @@
       let book_copy = await bookCopyService.getOne("barcode", book_barcode);
 
       event.target.value = "";
-      if(!book_copy) {
+      if (!book_copy) {
         return alert(`No match found for ${book_barcode}.`);
       }
 
       let book = await bookService.get(book_copy.book_id);
-      let publisher = await publisherService.get(book.publisher_id)
+      let publisher = await publisherService.get(book.publisher_id);
       let to_borrow = {
         book_copy: book_copy,
         book: book,
         publisher: publisher,
-      }
+      };
 
       borrowBook(to_borrow);
     }
@@ -111,125 +106,133 @@
   const handleQueuingKeyup = async (event) => {
     if (event.key === "Enter") {
       let queuingNumber = event.target.value;
-      let items = await reserveService.getBy('number', queuingNumber);
+      let items = await reserveService.getBy("number", queuingNumber);
 
       reserved_books = [...items];
-      console.log(reserved_books);
 
-      for(let i=0; i < items.length; i++) {
+      for (let i = 0; i < items.length; i++) {
         let book = await bookService.get(items[i].book_id);
-        let publisher = await publisherService.get(book.publisher_id)
+        let publisher = await publisherService.get(book.publisher_id);
         let to_borrow = {
           book: book,
           publisher: publisher,
-        }
+        };
 
         borrowBook(to_borrow);
       }
 
-      if(!items.length) {
+      if (!items.length) {
         to_borrow_books = [];
         selected_books = [];
       }
     }
-  }
+  };
 
   const borrowBook = (to_borrow) => {
-    if(to_borrow.book_copy) {
-      if(to_borrow.book_copy.status != 'Available') {
-        return alert(`Cannot borrow book because it was marked as ${to_borrow.book_copy.status.toLowerCase()}.`);
+    if (to_borrow.book_copy) {
+      if (to_borrow.book_copy.status != "Available") {
+        return alert(
+          `Cannot borrow book because it was marked as ${to_borrow.book_copy.status.toLowerCase()}.`
+        );
       }
 
-      let index = to_borrow_books.findIndex(book => book.book_copy?.id == to_borrow.book_copy.id);
+      let filtered_to_borrow = to_borrow_books.filter((item) => {
+        return item.book.id != to_borrow.book.id
+      });
 
-      if(index >= 0) {
-        return alert("Book already added.");
-      }
+      to_borrow_books = [...filtered_to_borrow, to_borrow];
+      selected_books  = uniq([...selected_books, to_borrow.book_copy.id]);
 
-      index = to_borrow_books.findIndex(item => item.book.id == to_borrow.book.id);
-      
-      if(index >= 0) {
-        let items = to_borrow_books.filter(item => item.book.id != to_borrow.book.id)
-        to_borrow_books = [...items, to_borrow];
-        selected_books = [...selected_books, to_borrow.book_copy.id];
-        return
-      }
+      return;
     }
 
     to_borrow_books = [...to_borrow_books, to_borrow];
-  }
+  };
 
   const handleChange = async (event, to_borrow) => {
     let checkbox = event.target;
 
-    if(checkbox.checked) {
+    if (checkbox.checked) {
       selected_books = [...selected_books, to_borrow.book_copy.id];
     } else {
       removeToBorrowBook(to_borrow);
     }
-  }
+  };
 
   const removeToBorrowBook = (to_borrow) => {
     let borrow = confirm("Remove this book?");
 
-    if(borrow) {
-      to_borrow_books = to_borrow_books.filter(book => book.book_copy.id != to_borrow.book_copy.id);
+    if (borrow) {
+      to_borrow_books = to_borrow_books.filter(
+        (book) => book.book_copy.id != to_borrow.book_copy.id
+      );
     }
-  }
+  };
 
   const processBorrowedBooks = async () => {
     processing = true;
 
     let formDatas = to_borrow_books
-      .filter(to_borrow => {
-        return selected_books.includes(to_borrow.book_copy?.id)
+      .filter((to_borrow) => {
+        return selected_books.includes(to_borrow.book_copy?.id);
       })
-      .map(to_borrow => {
+      .map((to_borrow) => {
         let formData = new FormData();
-        formData.set('book_copy_id', to_borrow.book_copy.id);
-        formData.set('member_id', borrower.id);
-        formData.set('borrowed_date', format(new Date(), 'yyyy-MM-dd'))
-        formData.set('due_date', format(addDays(new Date(), 7), 'yyyy-MM-dd'))
-        
+        formData.set("book_copy_id", to_borrow.book_copy.id);
+        formData.set("member_id", borrower.id);
+        formData.set("borrowed_date", format(new Date(), "yyyy-MM-dd"));
+        console.log({borrow_duration});
+        formData.set("due_date", format(addDays(new Date(), borrow_duration), "yyyy-MM-dd"));
+
         return formData;
       });
 
-    for(let i=0; i<formDatas.length; i++) {
+    for (let i = 0; i < formDatas.length; i++) {
       let formData = formDatas[i];
 
       await borrowedService.add(formData);
 
       let updateFormData = new FormData();
-      updateFormData.set('id', formData.get('book_copy_id'));
-      updateFormData.set('status', 'Borrowed');
+      updateFormData.set("id", formData.get("book_copy_id"));
+      updateFormData.set("status", "Borrowed");
 
       await bookCopyService.update(updateFormData);
     }
 
+    let wishlist_books = to_borrow_books.filter((to_borrow) => {
+      return !selected_books.includes(to_borrow.book_copy?.id);
+    });
 
-    let wishlist_books = to_borrow_books
-      .filter(to_borrow => {
-        return !(selected_books.includes(to_borrow.book_copy?.id))
-      })
-    
-    for(let i=0; i<wishlist_books.length; i++) {
+    for (let i = 0; i < wishlist_books.length; i++) {
       let wishlist_book = wishlist_books[i];
       let formData = new FormData();
 
-      formData.set('book_id', wishlist_book.book.id);
-      formData.set('member_id', borrower.id);
+      formData.set("book_id", wishlist_book.book.id);
+      formData.set("member_id", borrower.id);
+      formData.set("wished_date", format(new Date(), "yyyy-MM-dd"));
 
       await wishlistService.add(formData);
     }
     // @ts-ignore
-    await reserveService.deleteBy('number', document.querySelector('#queuing').value);
+    await reserveService.deleteBy(
+      "number",
+      document.querySelector("#queuing").value
+    );
 
-    alert("Successfully processed borrowed books.");
+    message = {
+      text: 'Successfully processed borrowed books.',
+      type: 'success',
+    };
+
     processing = false;
     to_borrow_books = [];
     borrower = null;
-  }
+  };
 
+  onMount(async () => {
+    let setting = await settingService.getOne('property', 'borrow_duration');
+    borrow_duration = parseInt(setting.value);
+  });
 </script>
 
 <Layout>
@@ -237,51 +240,48 @@
     class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
   >
     <Breadcrumb {crumbs} />
-    <div class="p-3">
+    <div class="px-3">
       <section class="barcode-section mb-5">
-        <div class="flex p-5 dark:text-white border mb-5 rounded-lg">
-          <section class="w-1/2">
-            <span class="w-32 inline-block">Borrower Name: </span>
-            <span>
-              {#if borrower}
-                {borrower.first_name}
-                {borrower.last_name}
-                ({borrower.type})
-              {/if}
-            </span><br />
-          </section>
-          <section class="w-1/2">
-            <span class="w-32 inline-block">Card Number: </span>
-            <span>
-              {#if borrower}
-                {borrower.card_number}
-              {/if}
-            </span>
-            <!-- svelte-ignore a11y-invalid-attribute -->
-            <a
-              href="#"
-              on:click|preventDefault={() => startCardScanner()}
-              class="mx-5 float-right font-medium text-primary-600 hover:underline dark:text-primary-500"
-              >SET</a
-            >
-          </section>
-        </div>
         <Card size="xl">
+          <div class="flex items-center mb-3">
+            <Label class="mx-2 w-full border-b">
+              <span class="block mb-2">Borrower Name:</span>
+              <div class="flex items-center" style="height: 42px;">
+                {#if borrower}
+                  <Avatar class="inline-bloc me-2" rounded src={`${HOST}/static/uploads/${borrower.photo}`} />
+                  <span class="font-semibold text-lg uppercase">{borrower.last_name} {borrower.first_name} - {borrower.card_number} ({borrower.type})</span>
+                {/if}
+              </div>
+            </Label>
+            <Label class="mx-2 w-full">
+              <span class="block mb-2">Queue number:</span>
+              <Input
+                disabled={processing}
+                id="queuing"
+                placeholder="Enter or scan queue number."
+                on:keyup={handleQueuingKeyup}
+              />
+            </Label>
+          </div>
           <div class="flex justify-between items-center">
-            <Input
-              disabled={processing} 
-              id="barcode"
-              placeholder="Enter or scan book's barcode."
-              class="mx-2"
-              on:keyup={handleBookBarcodeKeyup}
-            />
-            <Input
-              disabled={processing} 
-              id="queuing"
-              placeholder="Enter or scan queuing number."
-              class="mx-2"
-              on:keyup={handleQueuingKeyup}
-            />
+            <Label class="mx-2 w-full">
+              <span class="block mb-2">Book's barcode:</span>
+              <Input
+                disabled={processing}
+                id="barcode"
+                placeholder="Enter or scan book's barcode."
+                on:keyup={handleBookBarcodeKeyup}
+              />
+            </Label>
+            <Label class="mx-2 w-full">
+              <span class="block mb-2">Card number:</span>
+              <Input
+                disabled={processing}
+                on:keyup={handleCardBarcodeKeyup}
+                id="barcode_card_scanner"
+                placeholder="Enter or scan student/card number"
+              />
+            </Label>
           </div>
         </Card>
       </section>
@@ -303,34 +303,36 @@
               <TableBodyRow>
                 <TableBodyCell class="!p-4">
                   {#if to_borrow.book_copy}
-                    <Checkbox 
+                    <Checkbox
                       bind:group={selected_books}
                       on:change={(event) => handleChange(event, to_borrow)}
                       value={to_borrow.book_copy.id}
-                    />   
+                    />
                   {:else}
                     <Checkbox disabled />
-                  {/if}            
+                  {/if}
                 </TableBodyCell>
-                <TableBodyCell>{to_borrow.book_copy?.barcode ?? ""}</TableBodyCell>
+                <TableBodyCell
+                  >{to_borrow.book_copy?.barcode ?? ""}</TableBodyCell
+                >
                 <TableBodyCell>{to_borrow.book.title}</TableBodyCell>
                 <TableBodyCell>{to_borrow.book.publication_year}</TableBodyCell>
                 <TableBodyCell>{to_borrow.publisher.name}</TableBodyCell>
                 <TableBodyCell>
                   {#if to_borrow.book_copy}
-                  <Button 
-                    disabled={processing} 
-                    on:click={() => removeToBorrowBook(to_borrow)} 
-                    color="red" 
-                    size="sm" 
-                    class="gap-2"
-                  >
-                    <TrashBinSolid size="sm" />
-                  </Button>
+                    <Button
+                      disabled={processing}
+                      on:click={() => removeToBorrowBook(to_borrow)}
+                      color="red"
+                      size="sm"
+                      class="gap-2"
+                    >
+                      <TrashBinSolid size="sm" />
+                    </Button>
                   {/if}
                 </TableBodyCell>
               </TableBodyRow>
-            {:else}  
+            {:else}
               <TableBodyRow>
                 <TableBodyCell colspan="6" class="text-center">
                   No items found.
@@ -342,10 +344,7 @@
       </section>
       {#if borrower && selected_books.length}
         <Card size="xl" class="mt-4">
-          <Button 
-            disabled={processing} 
-            on:click={processBorrowedBooks}
-          >
+          <Button disabled={processing} on:click={processBorrowedBooks}>
             {#if processing}<Spinner size={4} class="me-2" />{/if}
             Process Books to Borrow
           </Button>
@@ -354,37 +353,7 @@
     </div>
   </main>
 
-  <Modal
-    title="Library Card Scanner"
-    bind:open={openWebcam}
-    placement="top-center"
-    size="xs"
-    autoclose
-    on:close={() => stopCardScanner()}
-  >
-    <div id="webcam_card_scanner" class="mx-auto" style="width: 350px;"></div>
-    <svelte:fragment slot="footer">
-      <Button color="alternative">Close</Button>
-    </svelte:fragment>
-  </Modal>
-  <Modal
-    title="Library Card Scanner"
-    bind:open={openBarcode}
-    placement="top-center"
-    size="xs"
-    autoclose
-    on:close={() => stopCardScanner()}
-  >
-    <div class="p-5">
-    <Input 
-      disabled={processing} 
-      on:keyup={handleCardBarcodeKeyup} 
-      id="barcode_card_scanner" 
-      placeholder="Enter or scan library card number" 
-    />
-    </div>
-    <svelte:fragment slot="footer">
-      <Button color="alternative">Close</Button>
-    </svelte:fragment>
-  </Modal>
+  {#if message} 
+    <MessageModal open={true} {message} on:close={handleMessageClose} />
+  {/if}
 </Layout>

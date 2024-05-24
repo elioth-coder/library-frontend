@@ -1,9 +1,6 @@
 <script>
   // @ts-nocheck
-
   import * as faceapi from "face-api.js";
-  import Layout from "../components/Layout.svelte";
-  import Breadcrumb from "../components/Breadcrumb.svelte";
   import {
     CheckCircleOutline,
     ExclamationCircleOutline,
@@ -16,27 +13,20 @@
 
   import { onDestroy, onMount } from "svelte";
   import EntryLogService from "../services/EntryLogService";
-  import EntryLogCrudTable from "../components/entry_log/EntryLogCrudTable.svelte";
+  import EntryLoggerTable from "../components/entry_logger/EntryLoggerTable.svelte";
+  import MemberService from "../services/MemberService";
 
   let { HOST } = CONFIG;
-  let crumbs = [
-    {
-      href: "#/entry_logger",
-      title: "Entry Logger",
-    },
-  ];
   let video;
   let previous = null;
   let intervalId = null;
   let imageData = null;
-  let columns = ["member_id", "dt_logged"];
   let status = {
     state: "idle",
     data: null,
   };
   let entryLogService = new EntryLogService();
-
-  let asyncItems = entryLogService.getAll();
+  let memberService = new MemberService();
 
   const startWebcam = () => {
     navigator.mediaDevices
@@ -112,7 +102,7 @@
               previous = item;
               formData.set("member_id", item.member.id);
               let logged = await entryLogService.add(formData);
-              asyncItems = entryLogService.getAll();
+              items = await getEntryLogs();
             }
           } catch (e) {
             status.state = "error";
@@ -127,7 +117,25 @@
     }, 100);
   };
 
-  onMount(() => {
+  const getEntryLogs = async () => {
+    let entries = await entryLogService.getAll();
+    let logs  = [];
+
+    for(let i=0; i<entries.length; i++) {
+      let item = entries[i];
+      item.member = memberService.get(item.member_id);
+
+      logs.push(item);
+    }
+
+    return logs;
+  }
+
+  let items;
+
+  onMount(async () => {
+    items = await getEntryLogs();
+
     if (video) {
       Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri(`${HOST}/static/models`),
@@ -143,68 +151,72 @@
     video.removeEventListener("play", handleVideo, false);
     clearInterval(intervalId);
   });
+
+  let cameraWidth  = 500;
+  let cameraHeight = 375;
 </script>
 
-<Layout>
+
   <main
     class="relative h-full w-full overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900"
   >
-    <Breadcrumb {crumbs} />
-    <div class="p-3">
-      <Heading tag="h1" class="mb-4 text-xl sm:text-2xl">Entry Logger</Heading>
+    <div class="px-3">
+      <Heading tag="h4" class="text-center mb-4">Entry Logger</Heading>
       <div class="flex">
-        <div class="pe-5 flex flex-col w-full dark:text-white">
-          <div class="overflow-y-scroll max-h-96">
-            <EntryLogCrudTable {asyncItems} {columns} />
-          </div>
-        </div>
-        <div style="min-width: 360px;">
-          <div>
-            <!-- svelte-ignore a11y-media-has-caption -->
-            <section id="video-container" class="relative">
-              <video bind:this={video} width="360" height="270" autoplay></video>
-            </section>
-            <canvas id="hidden-canvas" class="hidden"></canvas>
-          </div>
-          {#if imageData && status.state != "idle"}
-            <div class="flex mb-3">
-              <!-- <img src={imageData} alt="base64 data" style="height: 75px;" /> -->
-              {#if status.state == "processing"}
-                <div class="text-center w-full pt-2">
-                  <Alert color="yellow">
-                    <Spinner size={4} class="mx-2" />
-                    Searching for a face match in the database...
-                  </Alert>
-                </div>
-              {/if}
-              {#if status.state == "success"}
-                <div class="w-full pt-2 text-center">
-                  <Alert color="green">
-                    <CheckCircleOutline class="inline-block" />
-                    A face match was found for
-                    <br />{status.data.member.type.toLowerCase()}:
-                    {status.data.member.first_name}
-                    {status.data.member.last_name}.
-                  </Alert>
-                </div>
-              {/if}
-              {#if status.state == "error"}
-                <div class="w-full pt-2 text-center">
-                  <Alert color="red">
-                    <ExclamationCircleOutline class="inline-block" />
-                    {status.message}
-                  </Alert>
-                </div>
-              {/if}
+        <div class="w-full items-center justify-center bg-gray-200 flex flex-col">
+          <div style="min-width: {cameraWidth}px;" class="flex-col mx-auto">
+            <div>
+              <!-- svelte-ignore a11y-media-has-caption -->
+              <section id="video-container" class="relative">
+                <video bind:this={video} width={cameraWidth} height={cameraHeight} autoplay></video>
+              </section>
+              <canvas id="hidden-canvas" class="hidden"></canvas>
             </div>
-          {:else}
-            <div style="height: 75px;" class="mb-3"></div>
-          {/if}
+            {#if imageData && status.state != "idle"}
+              <div class="flex mb-3">
+                {#if status.state == "processing"}
+                  <div class="text-center w-full pt-2">
+                    <Alert color="yellow">
+                      <Spinner size={4} class="mx-2" />
+                      Searching for a face match in the database...
+                    </Alert>
+                  </div>
+                {/if}
+                {#if status.state == "success"}
+                  <div class="w-full pt-2 text-center">
+                    <Alert color="green">
+                      <CheckCircleOutline class="inline-block" />
+                      A face match was found for
+                      <br />{status.data.member.type.toLowerCase()}:
+                      {status.data.member.first_name}
+                      {status.data.member.last_name}.
+                    </Alert>
+                  </div>
+                {/if}
+                {#if status.state == "error"}
+                  <div class="w-full pt-2 text-center">
+                    <Alert color="red">
+                      <ExclamationCircleOutline class="inline-block" />
+                      {status.message}
+                    </Alert>
+                  </div>
+                {/if}
+              </div>
+            {:else}
+              <div style="height: 75px;" class="mb-3"></div>
+            {/if}
+          </div>  
+        </div>
+
+        <div class="px-5 flex flex-col w-full dark:text-white">
+          <div class="overflow-y-scroll max-h-screen">
+            <EntryLoggerTable {items} />
+          </div>
         </div>
       </div>
     </div>
   </main>
-</Layout>
+
 
 <style>
   #video-container {

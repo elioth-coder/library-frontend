@@ -26,6 +26,7 @@
     "date-fns-tz": "^3.0.0",
     "face-api.js": "^0.22.2",
     "html5-qrcode": "^2.3.8",
+    "lodash-es": "^4.17.21",
     "qrcode": "^1.5.3",
     "qs": "^6.12.1",
     "svelte-spa-router": "^4.0.1",

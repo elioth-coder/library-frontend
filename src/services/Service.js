@@ -17,6 +17,19 @@ class Service {
         return item;
     }
 
+    async getByForm(data) {
+        let response = await fetch(`${this.api}/${this.table_name}/get_by_form`, {
+            method: 'POST',
+            body: data,
+            credentials: 'include',
+        });
+        let { status, message, items } = await response.json();
+
+        if(status == 'error') throw new Error(message);
+
+        return items;
+    }
+
     async updateBy(data) {
         let response = await fetch(`${this.api}/${this.table_name}/update_by`, {
             method: 'PUT',
@@ -63,6 +76,17 @@ class Service {
         if(status == 'error') throw new Error(message);
 
         return item;
+    }
+
+    async count(id) {
+        let response = await fetch(`${this.api}/${this.table_name}/count`, {
+            credentials: 'include',
+        });
+        let { status, message, count } = await response.json();
+
+        if(status == 'error') throw new Error(message);
+
+        return count;
     }
 
     async getBy(column, value) {

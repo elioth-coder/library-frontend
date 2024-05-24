@@ -1,6 +1,6 @@
 <script>
   import { Button, Heading, Modal, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import cart_items from "../../stores/CartItems";
+  import cart_items from "../../stores/CurrentUserStore";
   import AsyncText from "../AsyncText.svelte";
   import { TrashBinOutline } from "flowbite-svelte-icons";
   import BookService from "../../services/BookService";

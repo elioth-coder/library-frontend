@@ -43,8 +43,9 @@
       let user = await userService.login(formData);
       processing = false;
 
-      console.log({user});
-      if (user) return replace("/");
+      if (user) {
+        return replace("/");
+      }
     } catch (e) {
       error = e;
       processing = false;

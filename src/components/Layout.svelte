@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import UserService from "../services/UserService";
   import { replace } from "svelte-spa-router";
+  import currentUser from "../stores/CurrentUserStore";
 
   let userService = new UserService();
   let user;
@@ -12,6 +13,7 @@
   onMount(async () => {
     try {
       user = await userService.me();
+      $currentUser = {...user};
     } catch (e) {
       alert(e.message);
       replace("/sign-in");

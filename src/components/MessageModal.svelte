@@ -1,26 +1,35 @@
 <script>
   import { Button, Modal } from "flowbite-svelte";
-  import { CheckCircleOutline, ExclamationCircleOutline } from "flowbite-svelte-icons";
+  import { CloseOutline, CheckCircleOutline, ExclamationCircleOutline } from "flowbite-svelte-icons";
 
   export let open = false;
   export let message;
 </script>
 
-<Modal bind:open size="xs" autoclose>
+<Modal title="System Message" bind:open size="xs" autoclose on:close>
   <div class="text-center">
-    {#if message.type=='error'}
+    {#if message.type=='warning'}
       <ExclamationCircleOutline
-        class="mx-auto mb-4 text-{message.type='success' ? 'green' : 'red'}-400 w-12 h-12 dark:text-{message.type='success' ? 'green' : 'red'}-200"
+        class="mx-auto mb-4 text-yellow-500 w-12 h-12 dark:text-yellow-300"
+      />
+    {/if}
+    {#if message.type=='error'}
+      <CloseOutline
+        class="mx-auto mb-4 text-red-500 w-12 h-12 dark:text-red-300"
       />
     {/if}
     {#if message.type=='success'}
       <CheckCircleOutline
-        class="mx-auto mb-4 text-{message.type='success' ? 'green' : 'red'}-400 w-12 h-12 dark:text-{message.type='success' ? 'green' : 'red'}-200"
+        class="mx-auto mb-4 text-green-500 w-12 h-12 dark:text-red-300"
       />
     {/if}
-    <h3 class="mb-5 text-lg font-normal text-{message.type='success' ? 'green' : 'red'}-500 dark:text-{message.type='success' ? 'green' : 'red'}-400">
-      {message.text}
+    <h3 class="mb-5 text-lg font-normal text-slate-900 dark:text-slate-400">
+      {@html message.text}
     </h3>
-    <Button color={message.type='success' ? 'green' : 'red'} class="me-2">OK</Button>
   </div>
+  <svelte:fragment slot="footer">
+    <section class="text-right w-full">
+      <Button color="primary">Close</Button>
+    </section>
+  </svelte:fragment>
 </Modal>
