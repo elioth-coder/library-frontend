@@ -78,6 +78,17 @@ class Service {
         return item;
     }
 
+    async countBy(column, value) {
+        let response = await fetch(`${this.api}/${this.table_name}/count_by/?column=${column}&value=${value}`, {
+            credentials: 'include',
+        });
+        let { status, message, count } = await response.json();
+
+        if(status == 'error') throw new Error(message);
+
+        return count;
+    }
+
     async count(id) {
         let response = await fetch(`${this.api}/${this.table_name}/count`, {
             credentials: 'include',

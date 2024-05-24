@@ -29,9 +29,11 @@
   import { onMount } from "svelte";
   import { uniq } from "lodash-es";
   import MessageModal from "../components/MessageModal.svelte";
+  import QueueService from "../services/QueueService";
 
   let bookCopyService = new BookCopyService();
   let bookService = new BookService();
+  let queueService = new QueueService();
   let memberService = new MemberService();
   let publisherService = new PublisherService();
   let borrowedService = new BorrowedService();
@@ -214,10 +216,10 @@
       await wishlistService.add(formData);
     }
     // @ts-ignore
-    await reserveService.deleteBy(
-      "number",
-      document.querySelector("#queuing").value
-    );
+    let queueNumber = document.querySelector("#queuing").value
+
+    await reserveService.deleteBy("number", queueNumber);
+    await queueService.delete(queueNumber);
 
     message = {
       text: 'Successfully processed borrowed books.',

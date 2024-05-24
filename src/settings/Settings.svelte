@@ -84,7 +84,7 @@
   }
 
   let locationElement;
-  let campus, borrow_duration, location, penalty_per_day;
+  let campus, borrow_duration, location, penalty_per_day, books_to_retain;
 
   onMount(async () => {
     let settingItems = await settingService.getAll();
@@ -100,6 +100,7 @@
     borrow_duration = settings.borrow_duration ?? "";
     location = settings.location ?? "";
     penalty_per_day = settings.penalty_per_day ?? "";
+    books_to_retain = settings.books_to_retain ?? "";
 
     let items = await campusService.getAll();
 
@@ -141,10 +142,11 @@
           value={borrow_duration ?? ""}
         />
         <Label for="location" class="text-right font-semibold mt-2">Library location : </Label>
+        <input type="hidden" name="location" value={location ?? ""} />
         <Input bind:this={locationElement} 
+          disabled
           placeholder="--location--" 
           id="location" 
-          name="location" 
           value={location ?? ""}
         />
         <Label for="penalty_per_day" class="text-right font-semibold mt-2">Penalty per day : </Label>
@@ -153,6 +155,13 @@
           type="number" 
           name="penalty_per_day" 
           value={penalty_per_day ?? ""}
+        />
+        <Label for="penalty_per_day" class="text-right font-semibold mt-2">Books to retain : </Label>
+        <Input placeholder="--books to retain--" 
+          id="books_to_retain" 
+          type="number" 
+          name="books_to_retain" 
+          value={books_to_retain ?? ""}
         />
         <section class="col-span-4 text-right">
           <Button type="submit" disabled={processing}>

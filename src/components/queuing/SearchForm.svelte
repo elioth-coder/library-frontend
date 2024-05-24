@@ -14,9 +14,9 @@
     let formData = new FormData(e.target);
 
     if(formData.get('type')) {
-      push(`/web_opac/search/?query=${formData.get('query')}&type=${formData.get('type')}`)
+      push(`/queuing/search/?query=${formData.get('query')}&type=${formData.get('type')}`)
     } else {
-      push(`/web_opac/search/?query=${formData.get('query')}`)
+      push(`/queuing/search/?query=${formData.get('query')}`)
     }
   }
 

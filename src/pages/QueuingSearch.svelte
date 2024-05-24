@@ -2,37 +2,32 @@
 // @ts-nocheck
   import "../app.pcss";
   import { onMount } from "svelte";
-  import UserService from "../services/UserService";
-  import Header from "../components/web_opac/Header.svelte";
-  import Sidebar from "../components/web_opac/Sidebar.svelte";
-  import Footer from "../components/web_opac/Footer.svelte";
-  import SearchForm from "../components/web_opac/SearchForm.svelte";
+  import SettingService from "../services/SettingService";
+  import Header from "../components/queuing/Header.svelte";
+  import Sidebar from "../components/queuing/Sidebar.svelte";
+  import Footer from "../components/queuing/Footer.svelte";
+  import SearchForm from "../components/queuing/SearchForm.svelte";
   import AsyncText from "../components/AsyncText.svelte";
   import { querystring } from "svelte-spa-router";
   import qs from "qs";
-  import { Modal, Button, Table, TableBody, TableHead, TableHeadCell, TableBodyRow, TableBodyCell, Label, Select, Card, Banner, Heading, Listgroup, ListgroupItem, P, Hr } from "flowbite-svelte";
+  import { Button, Table, TableBody, TableHead, TableHeadCell, TableBodyRow, TableBodyCell, Label, Select, Card, Banner, Heading, Listgroup, ListgroupItem, P, Hr } from "flowbite-svelte";
   import BookService from "../services/BookService";
   import BookCopyService from "../services/BookCopyService";
-  import { PlusOutline, TrashBinOutline } from "flowbite-svelte-icons";
-  import CartItemsModal from "../components/web_opac/CartItemsModal.svelte";
-  import QrModal from "../components/web_opac/QrModal.svelte";
-  import cart_items from '../stores/CurrentUserStore';
+  import { PlusOutline } from "flowbite-svelte-icons";
+  import CartItemsModal from "../components/queuing/CartItemsModal.svelte";
+  import QrModal from "../components/queuing/QrModal.svelte";
+  import cart_items from '../stores/CartItemsStore';
+  import ReserveService from "../services/ReserveService";
 
-  let userService = new UserService();
+  let settingService = new SettingService();
   let bookService = new BookService();
   let bookCopyService = new BookCopyService();
-  let user;
+  let reserveService = new ReserveService();
   let openCart = false;
   let openQR = false;
   let queueNumber;
   let queryText, items;
   let { HOST } = CONFIG;
-
-  onMount(async () => {
-    try {
-      user = await userService.me();
-    } catch (e) {}
-  });
 
   const addToCart = (item) => {
     $cart_items = [ ...$cart_items, item];
@@ -42,12 +37,20 @@
     $cart_items = $cart_items.filter(cart_item => cart_item.id != item.id);
   }
 
+  const availableCount = async (book_id) => {
+    let copiesCount = await bookCopyService.copiesCount(book_id, 'Available');
+    let reservedCount = await reserveService.countBy('book_id', book_id);
+
+    return copiesCount - reservedCount;
+  }
+
   const search = async (query) => {
     queryText = query
     items = await bookService.search(query);
 
     for(let i=0; i<items.length; i++) {
-      items[i].count = bookCopyService.copiesCount(items[i].id, 'Available');
+      let book_id = items[i].id;
+      items[i].count = availableCount(book_id);
     }
   }
 
@@ -71,12 +74,38 @@
     let { query, type } = qs.parse($querystring);
     search(query);
   }
+
+  let campus, borrow_duration, location, penalty_per_day, books_to_retain;
+  
+  onMount(async () => {
+    let settingItems = await settingService.getAll();
+    let settings = {};
+
+    for(let i=0; i<settingItems.length; i++) {
+      let item = settingItems[i];
+
+      settings[item.property] = item.value;
+    }
+    
+    campus = settings.campus ?? "";
+    borrow_duration = settings.borrow_duration ?? "";
+    location = settings.location ?? "";
+    penalty_per_day = settings.penalty_per_day ?? "";
+    books_to_retain = parseInt(settings.books_to_retain ?? "");
+
+    console.log({books_to_retain});
+  });
+
+  const handleQRModalClose = () => {
+    openQR = false;
+    window.location.reload();
+  }
 </script>
 
 <QrModal 
   {openQR}
   {queueNumber}
-  on:close={() => openQR = false} 
+  on:close={handleQRModalClose} 
 />
 
 <CartItemsModal 
@@ -126,18 +155,21 @@
                 {#await item.count}
                   <span>Loading...</span>
                 {:then count}
-                  <span>{count}</span><br><br>
-                  {#if count}
-                    {#if $cart_items.filter(cart_item => cart_item.id == item.id).length == 0}
-                      <Button style="width: 130px;" size="xs" outline on:click={() => addToCart(item)}>
+                  {#if count > books_to_retain}
+                    {#if $cart_items?.filter(cart_item => cart_item.id == item.id).length == 0}
+                      <span>{count}</span><br><br>
+                      <Button color="green" style="width: 130px;" size="xs" outline on:click={() => addToCart(item)}>
                         <PlusOutline class="w-4 h-4 me-1" />
                         Add to Cart
                       </Button>
                     {:else}
-                      <Button style="width: 130px;" size="xs" outline on:click={() => removeFromCart(item)}>
+                      <span>{count - 1}</span><br><br>
+                      <Button color="red" style="width: 130px;" size="xs" outline on:click={() => removeFromCart(item)}>
                         Remove from Cart
                       </Button>
                     {/if}
+                  {:else}
+                    <span>{count}</span><br><br>
                   {/if}
                 {/await}
               </TableBodyCell>

@@ -105,6 +105,8 @@
       }
     } catch (e) {}
   });
+
+  let member_type;
 </script>
 
 {#if message} 
@@ -174,41 +176,6 @@
               </div>
             </div>
             <Hr hrClass="my-7" />
-            <div class="grid gap-3 mb-3 grid-cols-2" style="margin-top: 25px;">
-              <div>
-                <Label for="year_level" class="mb-2">Year Level</Label>
-                <Select
-                  placeholder="Select year level"
-                  id="year_level"
-                  name="year_level"
-                  class="mt-2"
-                  items={year_levels}
-                  required
-                />
-              </div>
-              <div>
-                <Label for="course" class="mb-2">Course</Label>
-                <Select
-                  placeholder="Select course"
-                  id="course"
-                  name="course"
-                  class="mt-2"
-                  items={courses}
-                  required
-                />
-              </div>
-            </div>
-            <div class="my-5">
-              <Label for="campus" class="mb-2">School or Campus</Label>
-              <Select
-                placeholder="Select name of campus"
-                id="campus"
-                name="campus"
-                class="mt-2"
-                items={campuses}
-                required
-              />
-            </div>
             <div class="grid gap-3 mb-6 grid-cols-2">
               <div>
                 <Label for="card_number" class="mb-2">Card number</Label>
@@ -228,11 +195,50 @@
                   id="type"
                   name="type"
                   class="mt-2"
+                  bind:value={member_type}
                   items={member_types}
                   required
                 />
               </div>
             </div>
+            <div class="my-5">
+              <Label for="campus" class="mb-2">School or Campus</Label>
+              <Select
+                placeholder="Select name of campus"
+                id="campus"
+                name="campus"
+                class="mt-2"
+                items={campuses}
+                required
+              />
+            </div>
+            <div class="grid gap-3 mb-3 grid-cols-2" style="margin-top: 25px;">
+              <div>
+                <Label for="year_level" class="mb-2">Year Level</Label>
+                <Select
+                  disabled={member_type=='Faculty'}
+                  placeholder="Select year level"
+                  id="year_level"
+                  name="year_level"
+                  class="mt-2"
+                  items={year_levels}
+                  required
+                />
+              </div>
+              <div>
+                <Label for="course" class="mb-2">Course</Label>
+                <Select
+                  disabled={member_type=='Faculty'}
+                  placeholder="Select course"
+                  id="course"
+                  name="course"
+                  class="mt-2"
+                  items={courses}
+                  required
+                />
+              </div>
+            </div>
+
           </div>
           <div class="w-1/2 ms-3 mt-6">
             <div class="w-1/2 mx-auto mb-3">
@@ -277,6 +283,7 @@
               <Button
                 size="lg"
                 outline
+                color="green"
                 class="w-full"
                 type="submit"
                 disabled={processing}
@@ -288,12 +295,12 @@
                 href="#/sign-in/"
                 size="lg"
                 outline
-                color="green"
+                color="red"
                 class="w-full"
                 type="submit"
                 disabled={processing}
               >
-                Sign in
+                Cancel
               </Button>
             </div>
           </div>

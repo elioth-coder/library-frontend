@@ -11,11 +11,11 @@
   import SignIn from './pages/SignIn.svelte';
   import SignUp from './pages/SignUp.svelte';
   import EntryLogger from './pages/EntryLogger.svelte';
-  import WebOpac from './pages/WebOpac.svelte';
-  import WebOpacSearch from './pages/WebOpacSearch.svelte';
+  import Queuing from './pages/Queuing.svelte';
+  import QueuingSearch from './pages/QueuingSearch.svelte';
   import Records from './pages/Records.svelte';
   import Books from './pages/Books.svelte';
-  import Borrowed from './pages/Borrowed.svelte';
+  import Overdue from './pages/Overdue.svelte';
   import Reserved from './pages/Reserved.svelte';
   import Wishlist from './pages/Wishlist.svelte';
   import Borrow from './pages/Borrow.svelte';
@@ -38,7 +38,7 @@
     '/transact/return': Return, 
     '/books': Books,
     '/books/copies': BookCopy,
-    '/books/borrowed': Borrowed,
+    '/books/overdue': Overdue,
     '/books/reserved': Reserved,
     '/books/wishlist': Wishlist,
     '/records': Records,
@@ -60,8 +60,8 @@
     '/reports/books_available': AvailableBooks,
     '/reports/books_borrowed': BorrowedBooks,
 
-    '/web_opac': WebOpac,
-    '/web_opac/search': WebOpacSearch,
+    '/queuing': Queuing,
+    '/queuing/search': QueuingSearch,
 
     '/settings': Settings,
 

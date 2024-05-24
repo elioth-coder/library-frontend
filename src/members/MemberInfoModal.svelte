@@ -42,7 +42,13 @@
           </TableBodyRow>
           <TableBodyRow>
             <TableBodyCell class="font-semibold">Year &amp; Course</TableBodyCell>
-            <TableBodyCell>{member.course} {member.year_level}</TableBodyCell>
+            <TableBodyCell>
+              {#if member.type=='Student'}
+                {member.course} {member.year_level}
+              {:else}
+                N/A
+              {/if}
+            </TableBodyCell>
           </TableBodyRow>
           <TableBodyRow>
             <TableBodyCell class="font-semibold">Campus</TableBodyCell>

@@ -23,7 +23,7 @@
       title: "List of Books",
     },
     {
-      href: "#/books/borrowed",
+      href: "#/books/overdue",
       title: "Borrowed",
     },
   ];
@@ -76,7 +76,7 @@
   >
     <Breadcrumb {crumbs} />
     <div class="px-3">
-      <Heading tag="h4" class="text-center">Borrowed Books</Heading>
+      <Heading tag="h4" class="text-center">Overdue Books</Heading>
       <TableSearch
         placeholder="Search by book title"
         hoverable={true}
@@ -114,7 +114,9 @@
               <TableBodyCell>{item.due_date}</TableBodyCell>
               <TableBodyCell class="text-{color}-800 font-bold text-center">
                 {#if difference<0}
-                  Overdue
+                  Overdue 
+                  {#if difference==-1} 1 day{/if}
+                  {#if difference<=-2} {difference * -1} days{/if}
                 {:else}
                   Due
                   {#if difference==0}today{/if}

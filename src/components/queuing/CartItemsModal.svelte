@@ -1,6 +1,6 @@
 <script>
-  import { Button, Heading, Modal, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
-  import cart_items from "../../stores/CurrentUserStore";
+  import { Button, Heading, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+  import cart_items from "../../stores/CartItemsStore";
   import AsyncText from "../AsyncText.svelte";
   import { TrashBinOutline } from "flowbite-svelte-icons";
   import BookService from "../../services/BookService";
@@ -100,7 +100,7 @@
             >{item.genre}</TableBodyCell
           >
           <TableBodyCell class="align-top text-center">
-            <Button outline on:click={() => removeFromCart(item)}>
+            <Button color="red" outline on:click={() => removeFromCart(item)}>
               <TrashBinOutline />
             </Button>
           </TableBodyCell>
@@ -117,10 +117,18 @@
 
   <svelte:fragment slot="footer">
     {#if $cart_items.length}
-      <Button on:click={handleReservation}>Reserve</Button>
+      <Button disabled={processing} on:click={handleReservation}>
+        {#if processing}
+          <Spinner size={4} class="me-2" />
+        {/if}
+        Reserve
+      </Button>
     {/if}
-    <Button on:click={() => (openCart = false)} color="alternative"
-      >Close</Button
+    <Button disabled={processing} 
+      on:click={() => (openCart = false)} 
+      color="alternative"
     >
+      Close
+    </Button>
   </svelte:fragment>
 </Modal>

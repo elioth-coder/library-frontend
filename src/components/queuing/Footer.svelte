@@ -4,7 +4,7 @@
 
 <footer class="text-center">
   <Hr />
-  <Heading tag="h4">NEUST OPAC</Heading>
+  <Heading tag="h4">NEUST Library Queuing</Heading>
   <P class="text-sm mb-5 text-center">
     Copyright &copy; 2024. The University Library, Nueva Ecija University of
     Science and Technology

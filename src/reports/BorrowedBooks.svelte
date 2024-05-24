@@ -14,6 +14,8 @@
   import BookService from "../services/BookService";
   import BookCopyService from "../services/BookCopyService";
   import { sortBy } from "lodash-es";
+  import MemberService from "../services/MemberService";
+  import BorrowedService from "../services/BorrowedService";
 
   let crumbs = [
     {
@@ -27,28 +29,36 @@
   ];
   let bookService = new BookService();
   let bookCopyService = new BookCopyService();
+  let memberService = new MemberService();
+  let borrowedService = new BorrowedService();
   let items = [];
   let asyncItems;
 
   const getBorrowedBooks = async () => {
-    let copies = await bookCopyService.getBy("status", "Borrowed");
-    let availableBooks = [];
+    let borrowed_books = await borrowedService.getBorrowed();
+    let books = [];
 
-    for (let i = 0; i < copies.length; i++) {
-      let copy = copies[i];
-      let book = await bookService.get(copy.book_id);
-      let availableBook = {
-        barcode: copy.barcode,
+    for(let i=0; i<borrowed_books.length; i++) {
+      let borrowed_book = borrowed_books[i];
+      let book_copy = await bookCopyService.get(borrowed_book.book_copy_id);
+      let book = await bookService.get(book_copy.book_id);
+      let borrower = await memberService.get(borrowed_book.member_id);
+
+      let borrowed = {
+        barcode: book_copy.barcode,
         isbn: book.isbn,
         title: book.title,
         genre: book.genre,
-      };
+        borrowed_date: borrowed_book.borrowed_date,
+        due_date: borrowed_book.due_date,
+        borrowed_by: `${borrower.first_name} ${borrower.last_name}`,
+      }
 
-      availableBooks.push(availableBook);
+      books.push(borrowed);
     }
 
-    return sortBy(availableBooks, (book) => book.title);
-  };
+    return sortBy(books, (book) => book.title);
+  }
 
   let searchTerm;
   $: filteredItems = items.filter((item) => {
@@ -82,14 +92,15 @@
       >
         <TableHead>
           <TableHeadCell class="text-center">Barcode</TableHeadCell>
-          <TableHeadCell class="text-center">ISBN</TableHeadCell>
           <TableHeadCell>Title</TableHeadCell>
-          <TableHeadCell>Genre</TableHeadCell>
+          <TableHeadCell>Borrowed By</TableHeadCell>
+          <TableHeadCell>Borrowed On</TableHeadCell>
+          <TableHeadCell>Due Date</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y">
           {#await asyncItems}
             <TableBodyRow>
-              <TableBodyCell colspan={4} class="text-center"
+              <TableBodyCell colspan={5} class="text-center"
                 >Generating report...</TableBodyCell
               >
             </TableBodyRow>
@@ -97,9 +108,10 @@
           {#each filteredItems as item}
             <TableBodyRow>
               <TableBodyCell class="text-center">{item.barcode}</TableBodyCell>
-              <TableBodyCell class="text-center">{item.isbn}</TableBodyCell>
               <TableBodyCell>{item.title}</TableBodyCell>
-              <TableBodyCell>{item.genre}</TableBodyCell>
+              <TableBodyCell>{item.borrowed_by}</TableBodyCell>
+              <TableBodyCell>{item.borrowed_date}</TableBodyCell>
+              <TableBodyCell>{item.due_date}</TableBodyCell>
             </TableBodyRow>
           {/each}
         </TableBody>

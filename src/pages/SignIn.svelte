@@ -11,7 +11,7 @@
   } from "flowbite-svelte";
   import UserService from "../services/UserService";
   import { replace } from "svelte-spa-router";
-  import { InfoCircleSolid } from "flowbite-svelte-icons";
+  import { InfoCircleSolid, UserCircleOutline } from "flowbite-svelte-icons";
   import { onMount } from "svelte";
   export let site = {
     name: "Library Management",
@@ -19,12 +19,11 @@
     link: "/",
     imgAlt: "Library Logo",
   };
-  export let loginTitle = "Login to your account";
   export let mainClass = "bg-gray-50 dark:bg-gray-900 w-full";
   export let mainDivClass =
-    "flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen pt:mt-0 dark:bg-gray-900";
+    "flex flex-col items-center justify-center px-6 mx-auto md:h-screen dark:bg-gray-900";
   export let siteLinkClass =
-    "flex items-center justify-center mb-4 text-2xl font-semibold dark:text-white";
+    "flex items-center justify-center mb-1 text-2xl font-semibold dark:text-white";
   export let siteImgClass = "mr-4 h-11";
   let error = null;
   let processing = false;
@@ -32,7 +31,7 @@
 
   const dismissError = async () => {
     error = null;
-  }
+  };
 
   const handleSubmit = async (e) => {
     processing = true;
@@ -56,23 +55,23 @@
     try {
       const user = await userService.me();
 
-      if(user) {
+      if (user) {
         console.log(user);
-        return replace('/');
+        return replace("/");
       }
-    } catch(e) {}
+    } catch (e) {}
   });
 </script>
 
 <main class={mainClass}>
   <div class={mainDivClass}>
-
     <Card class="w-full">
       <a href={site.link} class={siteLinkClass}>
         <img src={site.img} class={siteImgClass} alt={site.imgAlt} />
         <span>{site.name}</span>
       </a>
-      <hr class="my-3">
+      <UserCircleOutline class="mx-auto h-28 w-28" size="lg" />
+      <!-- <hr class="my-3" /> -->
       <form class="space-y-5" on:submit|preventDefault={handleSubmit}>
         <div>
           <Label for="username" class="mb-2">Your username</Label>
@@ -96,26 +95,30 @@
             required
           />
         </div>
-        <Button 
-          type="submit" 
-          disabled={processing}
-        >
-          {#if processing}
-            <Spinner size={4} class="mr-2" />
-          {/if}
-          {loginTitle}
-        </Button>
+        <hr class="mt-5" />
+        <section class="grid grid-cols-2 gap-3">
+          <Button outline type="submit" disabled={processing}>
+            {#if processing}
+              <Spinner size={4} class="mr-2" />
+            {/if}
+            Login
+          </Button>
+          <Button outline color="green" href="#/sign-up">Register</Button>
+        </section>
       </form>
-      <hr class="mt-5">
-      <P class="text-sm my-3 text-center">Not yet a member?&nbsp; | &nbsp;<A href="#/sign-up" class="link">Sign-up here</A></P>
     </Card>
     {#if error}
-    <div class="max-w-sm w-full mt-3">
-      <Alert on:close={dismissError} defaultClass="p-4 gap-3 text-sm min-w-full max-w-sm" color="red" dismissable>
-        <InfoCircleSolid slot="icon" class="w-4 h-4" />
-        {error.message}
-      </Alert>
-    </div>
+      <div class="max-w-sm w-full mt-3">
+        <Alert
+          on:close={dismissError}
+          defaultClass="p-4 gap-3 text-sm min-w-full max-w-sm"
+          color="red"
+          dismissable
+        >
+          <InfoCircleSolid slot="icon" class="w-4 h-4" />
+          {error.message}
+        </Alert>
+      </div>
     {/if}
   </div>
 </main>

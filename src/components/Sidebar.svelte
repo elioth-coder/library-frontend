@@ -65,9 +65,8 @@
       href: "#/books",
       children: {
         Copies: "#/books/copies",
-        Borrowed: "#/books/borrowed",
-        "On Reserve": "#/books/reserved",
-        "On Wishlist": "#/books/wishlist",
+        Overdue: "#/books/overdue",
+        Wishlist: "#/books/wishlist",
       },
     },
     {
