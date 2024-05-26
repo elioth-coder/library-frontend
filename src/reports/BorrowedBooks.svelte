@@ -108,7 +108,7 @@
           {#each filteredItems as item}
             <TableBodyRow>
               <TableBodyCell class="text-center">{item.barcode}</TableBodyCell>
-              <TableBodyCell>{item.title}</TableBodyCell>
+              <TableBodyCell class="overflow-hidden text-ellipsis" style="max-width: 230px;">{item.title}</TableBodyCell>
               <TableBodyCell>{item.borrowed_by}</TableBodyCell>
               <TableBodyCell>{item.borrowed_date}</TableBodyCell>
               <TableBodyCell>{item.due_date}</TableBodyCell>

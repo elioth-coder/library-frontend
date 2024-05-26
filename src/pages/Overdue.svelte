@@ -36,7 +36,11 @@
 
 
   $: filteredItems = items.filter(
-    (item) => item.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+    (item) => {
+      return item.title.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+      item.isbn.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||
+      item.barcode.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+    }
   );
 
   const getBorrowedBooks = async () => {
@@ -51,6 +55,7 @@
 
       let borrowed = {
         barcode: book_copy.barcode,
+        isbn: book.isbn,
         title: book.title,
         borrowed_date: borrowed_book.borrowed_date,
         due_date: borrowed_book.due_date,
@@ -85,9 +90,8 @@
       >
         <TableHead>
           <TableHeadCell class="text-right">No.</TableHeadCell>
-          <TableHeadCell class="text-center">Borrowed On</TableHeadCell>
           <TableHeadCell>Barcode</TableHeadCell>
-          <TableHeadCell>Book Title</TableHeadCell>
+          <TableHeadCell>ISBN / Title</TableHeadCell>
           <TableHeadCell>Borrowed By</TableHeadCell>
           <TableHeadCell>Due Date</TableHeadCell>
           <TableHeadCell class="text-center">Remarks</TableHeadCell>
@@ -107,9 +111,11 @@
             }  
             <TableBodyRow>
               <TableBodyCell class="text-right">{index + 1}. </TableBodyCell>
-              <TableBodyCell class="text-center">{item.borrowed_date}</TableBodyCell>
               <TableBodyCell>{item.barcode}</TableBodyCell>
-              <TableBodyCell>{item.title}</TableBodyCell>
+              <TableBodyCell title={item.title} style="max-width: 200px;" class="overflow-hidden text-ellipsis">
+                <span class="text-xs text-gray-500">ISBN: {item.isbn}</span><br>
+                {item.title}
+              </TableBodyCell>
               <TableBodyCell>{item.borrowed_by}</TableBodyCell>
               <TableBodyCell>{item.due_date}</TableBodyCell>
               <TableBodyCell class="text-{color}-800 font-bold text-center">

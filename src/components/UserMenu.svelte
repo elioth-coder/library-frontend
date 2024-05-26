@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+  A,
     Avatar,
     Dropdown,
     DropdownDivider,
@@ -36,7 +37,9 @@
     <span class="block text-sm">{name}</span>
     <span class="block truncate text-sm font-medium">{email}</span>
   </DropdownHeader>
-  <DropdownItem href="#/">Dashboard</DropdownItem>
+  <DropdownItem>
+    <A href="#/">Dashboard</A>
+  </DropdownItem>
   <DropdownDivider />
   <DropdownItem on:click={handleLogout}>Logout</DropdownItem>
 </Dropdown>

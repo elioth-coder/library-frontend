@@ -20,7 +20,6 @@
   } from "flowbite-svelte";
   import BookCopyService from "../services/BookCopyService";
   import BookService from "../services/BookService";
-  import PublisherService from "../services/PublisherService";
   import BorrowedService from "../services/BorrowedService";
   import { differenceInCalendarDays, format } from "date-fns";
   import MemberService from "../services/MemberService";
@@ -31,7 +30,6 @@
   let memberService = new MemberService();
   let bookCopyService = new BookCopyService();
   let bookService = new BookService();
-  let publisherService = new PublisherService();
   let borrowedService = new BorrowedService();
   let settingService = new SettingService();
   let message = null;
@@ -66,7 +64,6 @@
 
   const handleMessageClose = () => {
     message = null;
-    console.log(message);
   }
 
   const handleCardBarcodeKeyup = async (event) => {
@@ -93,12 +90,10 @@
       let item = items[i];
       let book_copy = await bookCopyService.get(item.book_copy_id);
       let book = await bookService.get(book_copy.book_id);
-      let publisher = await publisherService.get(book.publisher_id);
       let borrowed = {
         ...item,
         book_copy: book_copy,
         book: book,
-        publisher: publisher,
       };
 
       borrowed_items.push(borrowed);
@@ -227,7 +222,6 @@
     }
   }
 
-
   const processReturnedBooks = async () => {
     processing = true;
 
@@ -338,7 +332,7 @@
               <TableHeadCell class="!p-4">
                 <Checkbox />
               </TableHeadCell>
-              <TableHeadCell>Borrowed Date</TableHeadCell>
+              <TableHeadCell>Borrowed On</TableHeadCell>
               <TableHeadCell>Barcode</TableHeadCell>
               <TableHeadCell>Book Title</TableHeadCell>
               <TableHeadCell>Due Date</TableHeadCell>
@@ -370,7 +364,14 @@
                     </TableBodyCell>
                     <TableBodyCell>{borrowed.borrowed_date}</TableBodyCell>
                     <TableBodyCell>{borrowed.book_copy.barcode}</TableBodyCell>
-                    <TableBodyCell>{borrowed.book.title}</TableBodyCell>
+                    <TableBodyCell 
+                      title={borrowed.book.title}
+                      class="overflow-hidden text-ellipsis"
+                      style="max-width: 200px;"
+                    >
+                      <span class="text-gray-500">ISBN: {borrowed.book.isbn}</span><br>
+                      {borrowed.book.title}
+                    </TableBodyCell>
                     <TableBodyCell>{borrowed.due_date}</TableBodyCell>
                     {#if date_difference > 0}
                       {@const penalty = date_difference * penalty_per_day}

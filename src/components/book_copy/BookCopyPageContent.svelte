@@ -3,12 +3,11 @@
   import Toast from "../Toast.svelte";
   import ConfirmationPopup from "../ConfirmationPopup.svelte";
   import BookCopyCrudTable from "./BookCopyCrudTable.svelte";
-  import CrudToolbar from "../CrudToolbar.svelte";
   import BookCopyForm from "./BookCopyForm.svelte";
   import FormContainerModal from "../FormContainerModal.svelte";
+  import { Button } from "flowbite-svelte";
 
   let table_name = "book_copy";
-  let columns = ["id", "barcode", "book_id", "price", "status"];
   let service = new BookCopyService();
   let modalSize = "md";
 
@@ -118,15 +117,11 @@
   };
 </script>
 
-<CrudToolbar
-  {table_name}
-  on:add_item={() => addItem()}
-  on:search={handleSearch}
-/>
-
+<div class="w-full text-right z-50" style="margin-bottom: -20px;">
+  <Button on:click={() => addItem()}>Add new copy</Button>
+</div>
 <BookCopyCrudTable
   {asyncItems}
-  {columns}
   on:edit={({ detail: item }) => editItem(item)}
   on:delete={({ detail: item }) => confirmDelete(item)}
 />

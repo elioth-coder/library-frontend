@@ -6,21 +6,13 @@
   import BookForm from "./BookForm.svelte";
   import FormContainerModal from "../FormContainerModal.svelte";
   import BookCrudTable from "./BookCrudTable.svelte";
+  import { onMount } from "svelte";
 
   let table_name = "book";
-  let columns = [
-    "id",
-    "title",
-    "publication_year",
-    "genre",
-    "page_count",
-    "language",
-    "edition",
-  ];
   let service = new BookService();
   let modalSize = "md";
 
-  let asyncItems = service.getAll();
+  let asyncItems;
 
   let showConfirmation = false;
   let showModal = false;
@@ -124,6 +116,10 @@
     showConfirmation = false;
     processing = false;
   };
+
+  onMount(async () => {
+    asyncItems = service.getAll();
+  });
 </script>
 
 <CrudToolbar
@@ -132,12 +128,13 @@
   on:search={handleSearch}
 />
 
-<BookCrudTable
-  {asyncItems}
-  {columns}
-  on:edit={({ detail: item }) => editItem(item)}
-  on:delete={({ detail: item }) => confirmDelete(item)}
-/>
+{#if asyncItems}
+  <BookCrudTable
+    {asyncItems}
+    on:edit={({ detail: item }) => editItem(item)}
+    on:delete={({ detail: item }) => confirmDelete(item)}
+  />
+{/if}
 
 <ConfirmationPopup
   {processing}

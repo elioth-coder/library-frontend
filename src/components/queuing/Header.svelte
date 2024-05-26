@@ -38,13 +38,12 @@
       {/if}
       <DarkMode />
       <Button
-        color="dark"
         class="border-none"
         outline
-        size="xs"
+        size="sm"
         href="#/sign-in/"
       >
-        Sign in
+        Login
       </Button>
     </div>
   </Navbar>

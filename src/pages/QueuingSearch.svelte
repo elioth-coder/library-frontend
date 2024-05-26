@@ -7,7 +7,6 @@
   import Sidebar from "../components/queuing/Sidebar.svelte";
   import Footer from "../components/queuing/Footer.svelte";
   import SearchForm from "../components/queuing/SearchForm.svelte";
-  import AsyncText from "../components/AsyncText.svelte";
   import { querystring } from "svelte-spa-router";
   import qs from "qs";
   import { Button, Table, TableBody, TableHead, TableHeadCell, TableBodyRow, TableBodyCell, Label, Select, Card, Banner, Heading, Listgroup, ListgroupItem, P, Hr } from "flowbite-svelte";
@@ -53,13 +52,6 @@
       items[i].count = availableCount(book_id);
     }
   }
-
-  const getAuthorFullName = async (book_id) => {
-    let authors = await bookService.authors(book_id, 'Main Author');
-    let author = authors[0];
-
-    return author ? `${author.first_name} ${author.last_name}` : "";
-  };
 
   const handleQR = (e) => {
     let queue = e.detail;
@@ -144,9 +136,9 @@
           {#each items as item, index}
             <TableBodyRow>
               <TableBodyCell class="align-top text-right">{index + 1}.</TableBodyCell>
-              <TableBodyCell class="align-top">
-                <Heading tag="h6">{item.title}</Heading>
-                <span class="font-thin">by: <AsyncText classes="text-sm font-normal" promise={getAuthorFullName(item.id)} /></span>
+              <TableBodyCell title={item.title} class="align-top" style="max-width: 310px;">
+                <Heading tag="h6" class="overflow-hidden text-ellipsis w-full">{item.title}</Heading>
+                <span class="font-thin">{item.author}</span>
                 <br>
                 <span class="font-thin">Published: {item.publication_year}</span>
               </TableBodyCell>
@@ -176,10 +168,10 @@
               <TableBodyCell class="text-center">
                 {#if item.cover}
                   <!-- svelte-ignore a11y-missing-attribute -->
-                  <img src={`${HOST}/static/uploads/${item.cover}`} style="width: 75px;" />
+                  <img src={`${HOST}/static/uploads/${item.cover}`} style="height: 70px;" />
                 {:else}
                   <!-- svelte-ignore a11y-missing-attribute -->
-                  <img src={`${HOST}/static/uploads/book_cover.png`} style="width: 75px;" />
+                  <img src={`${HOST}/static/uploads/book_cover.png`} style="height: 70px;" />
                 {/if}  
               </TableBodyCell>
             </TableBodyRow>

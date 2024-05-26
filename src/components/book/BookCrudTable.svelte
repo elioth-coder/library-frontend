@@ -14,7 +14,6 @@
   import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
-  export let columns;
   export let asyncItems;
   let items;
 
@@ -27,14 +26,15 @@
   <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
     <TableHeadCell class="pe-0 text-center"><Checkbox /></TableHeadCell>
     <TableHeadCell class="px-0 text-center">ACTION</TableHeadCell>
-    {#each columns as column}
-      <TableHeadCell>{column.replace("_", " ")}</TableHeadCell>
-    {/each}
+    <TableHeadCell>ISBN</TableHeadCell>
+    <TableHeadCell>Title</TableHeadCell>
+    <TableHeadCell>Copyright</TableHeadCell>
+    <TableHeadCell>Author</TableHeadCell>
   </TableHead>
   <TableBody>
     {#await asyncItems}
       <TableBodyRow>
-        <TableBodyCell colspan={columns.length + 2} class="text-center">
+        <TableBodyCell colspan={6} class="text-center">
           <Spinner size={4} class="me-1" />
           Fetching items...
         </TableBodyCell>
@@ -42,7 +42,7 @@
     {:catch error}
       <TableBodyRow>
         <TableBodyCell
-          colspan={columns.length + 2}
+          colspan={6}
           class="text-center text-red-600"
         >
           {error.message}
@@ -52,17 +52,8 @@
     {#if items}
       {#each items as item}
         <TableBodyRow>
-          <TableBodyCell class="pe-0 text-center"><Checkbox /></TableBodyCell>
-          <TableBodyCell class="px-0 space-x-2 text-center">
-            <Button
-              title="Authors"
-              href={`#/records/books/${item.id}/author`}
-              size="sm"
-              color="green"
-              class="gap-2"
-            >
-              <UsersOutline size="sm" />
-            </Button>
+          <TableBodyCell style="max-width: 20px;" class="pe-0 text-center"><Checkbox /></TableBodyCell>
+          <TableBodyCell style="max-width: 100px;" class="px-0 space-x-2 text-center">
             <Button
               title="Edit"
               on:click={() => dispatch("edit", item)}
@@ -81,15 +72,14 @@
               <TrashBinSolid size="sm" />
             </Button>
           </TableBodyCell>
-          {#each columns as column}
-            <TableBodyCell class="font-thin">
-              {item[column]}
-            </TableBodyCell>
-          {/each}
+          <TableBodyCell title={item.isbn} style="max-width: 130px;" class="text-ellipsis overflow-hidden">{item.isbn}</TableBodyCell>
+          <TableBodyCell title={item.title} style="max-width: 210px;" class="text-ellipsis overflow-hidden">{item.title}</TableBodyCell>
+          <TableBodyCell title={item.author} style="max-width: 60px;" class="text-ellipsis overflow-hidden">{item.author}</TableBodyCell>
+          <TableBodyCell title={item.publication_year} style="max-width: 60px;">{item.publication_year}</TableBodyCell>
         </TableBodyRow>
       {:else}
         <TableBodyRow>
-          <TableBodyCell colspan={columns.length + 2} class="text-center">
+          <TableBodyCell colspan={6} class="text-center">
             No items found.
           </TableBodyCell>
         </TableBodyRow>

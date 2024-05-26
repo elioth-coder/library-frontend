@@ -64,6 +64,16 @@
 </script>
 
 <main class={mainClass}>
+  <Button
+    class="border-none absolute top-2 right-2 hidden sm:inline-block"
+    outline
+    size="sm"
+    href="#/queuing/"
+  >
+    Queuing System
+    &rarr;
+  </Button>
+
   <div class={mainDivClass}>
     <Card class="w-full">
       <a href={site.link} class={siteLinkClass}>

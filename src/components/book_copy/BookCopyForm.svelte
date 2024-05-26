@@ -17,7 +17,8 @@
   let book_statuses = [
     { value: 'Available', name: 'Available' },
     { value: 'Borrowed', name: 'Borrowed' },
-    { value: 'Missing', name: 'Missing' },
+    { value: 'Lost', name: 'Lost' },
+    { value: 'Damaged', name: 'Damaged' },
   ];
 
   $: if (Boolean(item)) {

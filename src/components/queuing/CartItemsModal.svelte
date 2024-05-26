@@ -1,5 +1,16 @@
 <script>
-  import { Button, Heading, Modal, Spinner, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+  import {
+    Button,
+    Heading,
+    Modal,
+    Spinner,
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+  } from "flowbite-svelte";
   import cart_items from "../../stores/CartItemsStore";
   import AsyncText from "../AsyncText.svelte";
   import { TrashBinOutline } from "flowbite-svelte-icons";
@@ -12,7 +23,7 @@
   const dispatch = createEventDispatcher();
 
   export let openCart;
-  let {HOST} = CONFIG;
+  let { HOST } = CONFIG;
   let processing = false;
   let bookService = new BookService();
   let queueService = new QueueService();
@@ -22,37 +33,30 @@
     processing = true;
 
     let formData = new FormData();
-    formData.set('dt_created', format(new Date(), 'yyyy-MM-dd HH:mm:ss'))
+    formData.set("dt_created", format(new Date(), "yyyy-MM-dd HH:mm:ss"));
     let queue = await queueService.add(formData);
 
-    for(let i=0; i<$cart_items.length; i++) {
+    for (let i = 0; i < $cart_items.length; i++) {
       let item = $cart_items[i];
 
       console.log(item);
       let reserveFormData = new FormData();
 
-      reserveFormData.set('number', queue.id);
-      reserveFormData.set('book_id', item.id);
-      
+      reserveFormData.set("number", queue.id);
+      reserveFormData.set("book_id", item.id);
+
       await reserveService.add(reserveFormData);
     }
 
     $cart_items = [];
     processing = false;
-    dispatch('close');
-    dispatch('open-qr', queue);
-  }
-
-  const getAuthorFullName = async (book_id) => {
-    let authors = await bookService.authors(book_id, 'Main Author');
-    let author = authors[0];
-
-    return author ? `${author.first_name} ${author.last_name}` : "";
+    dispatch("close");
+    dispatch("open-qr", queue);
   };
 
   const removeFromCart = (item) => {
-    $cart_items = $cart_items.filter(cart_item => cart_item.id != item.id);
-  }
+    $cart_items = $cart_items.filter((cart_item) => cart_item.id != item.id);
+  };
 </script>
 
 <Modal title="Cart Items" bind:open={openCart} on:close>
@@ -81,18 +85,15 @@
               <!-- svelte-ignore a11y-missing-attribute -->
               <img
                 src={`${HOST}/static/uploads/book_cover.png`}
-                style="width: 75px;"
+                style="height: 60px;"
               />
             {/if}
           </TableBodyCell>
-          <TableBodyCell class="align-top">
-            <Heading tag="h6">{item.title}</Heading>
-            <span class="font-thin"
-              >by: <AsyncText
-                classes="text-sm font-normal"
-                promise={getAuthorFullName(item.id)}
-              /></span
+          <TableBodyCell class="align-top" style="max-width: 230px;">
+            <Heading tag="h6" class="w-full overflow-hidden text-ellipsis"
+              >{item.title}</Heading
             >
+            <span class="font-thin">by: {item.author}</span>
             <br />
             <span class="font-thin">Published: {item.publication_year}</span>
           </TableBodyCell>
@@ -116,19 +117,22 @@
   </Table>
 
   <svelte:fragment slot="footer">
-    {#if $cart_items.length}
-      <Button disabled={processing} on:click={handleReservation}>
-        {#if processing}
-          <Spinner size={4} class="me-2" />
-        {/if}
-        Reserve
+    <section class="w-full text-right">
+      {#if $cart_items.length}
+        <Button disabled={processing} on:click={handleReservation}>
+          {#if processing}
+            <Spinner size={4} class="me-2" />
+          {/if}
+          Reserve
+        </Button>
+      {/if}
+      <Button
+        disabled={processing}
+        on:click={() => (openCart = false)}
+        color="alternative"
+      >
+        Close
       </Button>
-    {/if}
-    <Button disabled={processing} 
-      on:click={() => (openCart = false)} 
-      color="alternative"
-    >
-      Close
-    </Button>
+    </section>
   </svelte:fragment>
 </Modal>

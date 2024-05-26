@@ -1,13 +1,10 @@
 <script>
   import Router from 'svelte-spa-router';
   import Dashboard from './pages/Dashboard.svelte';
-  import Publisher from './pages/Publisher.svelte';
   import Book from './pages/Book.svelte';
-  import Author from './pages/Author.svelte';
   import NotFound from './pages/NotFound.svelte';
   import BookCopy from './pages/BookCopy.svelte';
   import Return from './pages/Return.svelte';
-  import BookAuthor from './pages/BookAuthor.svelte';
   import SignIn from './pages/SignIn.svelte';
   import SignUp from './pages/SignUp.svelte';
   import EntryLogger from './pages/EntryLogger.svelte';
@@ -16,7 +13,6 @@
   import Records from './pages/Records.svelte';
   import Books from './pages/Books.svelte';
   import Overdue from './pages/Overdue.svelte';
-  import Reserved from './pages/Reserved.svelte';
   import Wishlist from './pages/Wishlist.svelte';
   import Borrow from './pages/Borrow.svelte';
   import Settings from './settings/Settings.svelte';
@@ -26,31 +22,35 @@
   import Pending from './members/Pending.svelte';
   import Approved from './members/Approved.svelte';
   import Rejected from './members/Rejected.svelte';
-  import StudentBorrowed from './student/StudentBorrowed.svelte';
-  import StudentReturned from './student/StudentReturned.svelte';
-  import StudentWishlist from './student/StudentWishlist.svelte';
   import Campus from './components/campus/Campus.svelte';
+  import QueuingNumber from './pages/QueuingNumber.svelte';
+  import UserDashboard from './user/Dashboard.svelte';
+  import UserProfile from './user/Profile.svelte';
+  import UserBorrowed from './user/Borrowed.svelte';
+  import UserReturned from './user/Returned.svelte';
+  import UserSearch from './user/Search.svelte';
+  import UserWishlist from './user/Wishlist.svelte';
   
   const routes = {
     '/': Dashboard,
+    '/manage_queuing': QueuingNumber,
     '/entry_logger': EntryLogger,
     '/transact/borrow': Borrow, 
     '/transact/return': Return, 
     '/books': Books,
     '/books/copies': BookCopy,
     '/books/overdue': Overdue,
-    '/books/reserved': Reserved,
     '/books/wishlist': Wishlist,
     '/records': Records,
     '/records/books': Book,
-    '/records/books/:id/author': BookAuthor,
-    '/records/authors': Author,
-    '/records/publishers': Publisher,
     '/records/campuses': Campus,
 
-    '/student/borrowed': StudentBorrowed,
-    '/student/returned': StudentReturned,
-    '/student/wishlist': StudentWishlist,
+    '/user': UserDashboard,
+    '/user/search': UserSearch,
+    '/user/borrowed': UserBorrowed,
+    '/user/returned': UserReturned,
+    '/user/wishlist': UserWishlist,
+    '/user/profile': UserProfile,
 
     '/members/pending': Pending,
     '/members/approved': Approved,

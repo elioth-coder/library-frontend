@@ -20,8 +20,8 @@
     ArrowUpRightFromSquareOutline,
     HeartOutline,
     CogOutline,
-    CodeSolid,
     DrawSquareOutline,
+    OrdoredListOutline,
   } from "flowbite-svelte-icons";
   import { location, replace } from "svelte-spa-router";
   import UserService from "../services/UserService";
@@ -50,6 +50,7 @@
 
   let posts = [
     { name: "Dashboard", icon: PieChartSolid, href: "#/" },
+    { name: "Queuing No.", icon: OrdoredListOutline, href: "#/manage_queuing" },
     {
       name: "Borrow / Return",
       icon: ArrowUpDownOutline,
@@ -85,8 +86,6 @@
       href: "#/records",
       children: {
         Books: "#/records/books",
-        Publishers: "#/records/publishers",
-        Authors: "#/records/authors",
         Campuses: "#/records/campuses",
       },
     },

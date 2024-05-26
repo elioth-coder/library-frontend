@@ -2,10 +2,12 @@
   import Layout from "../components/Layout.svelte";
   import Breadcrumb from "../components/Breadcrumb.svelte";
   import {
-  Avatar,
+    Avatar,
     Button,
     Card,
     Checkbox,
+    CloseButton,
+    Drawer,
     Input,
     Label,
     Spinner,
@@ -16,10 +18,11 @@
     TableHead,
     TableHeadCell,
   } from "flowbite-svelte";
-  import { TrashBinSolid } from "flowbite-svelte-icons";
+  import { querystring, replace } from "svelte-spa-router";
+  import { parse } from "qs";
+  import { CheckCircleOutline, CheckOutline, InfoCircleSolid, TrashBinSolid } from "flowbite-svelte-icons";
   import BookCopyService from "../services/BookCopyService";
   import BookService from "../services/BookService";
-  import PublisherService from "../services/PublisherService";
   import BorrowedService from "../services/BorrowedService";
   import ReserveService from "../services/ReserveService";
   import { addDays, format } from "date-fns";
@@ -30,12 +33,12 @@
   import { uniq } from "lodash-es";
   import MessageModal from "../components/MessageModal.svelte";
   import QueueService from "../services/QueueService";
+  import { sineIn } from "svelte/easing";
 
   let bookCopyService = new BookCopyService();
   let bookService = new BookService();
   let queueService = new QueueService();
   let memberService = new MemberService();
-  let publisherService = new PublisherService();
   let borrowedService = new BorrowedService();
   let reserveService = new ReserveService();
   let wishlistService = new WishlistService();
@@ -55,7 +58,7 @@
 
   const handleMessageClose = () => {
     message = null;
-  }
+  };
 
   let borrower = null;
   let to_borrow_books = [];
@@ -73,9 +76,9 @@
       if (!member) {
         message = {
           text: `Card number ${card_barcode} not found!`,
-          type: 'error',
+          type: "error",
         };
-        
+
         return;
       }
 
@@ -94,11 +97,9 @@
       }
 
       let book = await bookService.get(book_copy.book_id);
-      let publisher = await publisherService.get(book.publisher_id);
       let to_borrow = {
         book_copy: book_copy,
         book: book,
-        publisher: publisher,
       };
 
       borrowBook(to_borrow);
@@ -109,24 +110,16 @@
     if (event.key === "Enter") {
       let queuingNumber = event.target.value;
       let items = await reserveService.getBy("number", queuingNumber);
-
-      reserved_books = [...items];
+      let reservedItems = [];
 
       for (let i = 0; i < items.length; i++) {
         let book = await bookService.get(items[i].book_id);
-        let publisher = await publisherService.get(book.publisher_id);
-        let to_borrow = {
-          book: book,
-          publisher: publisher,
-        };
 
-        borrowBook(to_borrow);
+        reservedItems.push(book);
       }
 
-      if (!items.length) {
-        to_borrow_books = [];
-        selected_books = [];
-      }
+      reserved_books = [...reservedItems];
+      hiddenDrawer = false;
     }
   };
 
@@ -139,11 +132,11 @@
       }
 
       let filtered_to_borrow = to_borrow_books.filter((item) => {
-        return item.book.id != to_borrow.book.id
+        return item.book.id != to_borrow.book.id;
       });
 
       to_borrow_books = [...filtered_to_borrow, to_borrow];
-      selected_books  = uniq([...selected_books, to_borrow.book_copy.id]);
+      selected_books = uniq([...selected_books, to_borrow.book_copy.id]);
 
       return;
     }
@@ -183,8 +176,11 @@
         formData.set("book_copy_id", to_borrow.book_copy.id);
         formData.set("member_id", borrower.id);
         formData.set("borrowed_date", format(new Date(), "yyyy-MM-dd"));
-        console.log({borrow_duration});
-        formData.set("due_date", format(addDays(new Date(), borrow_duration), "yyyy-MM-dd"));
+        console.log({ borrow_duration });
+        formData.set(
+          "due_date",
+          format(addDays(new Date(), borrow_duration), "yyyy-MM-dd")
+        );
 
         return formData;
       });
@@ -201,40 +197,77 @@
       await bookCopyService.update(updateFormData);
     }
 
-    let wishlist_books = to_borrow_books.filter((to_borrow) => {
-      return !selected_books.includes(to_borrow.book_copy?.id);
-    });
+    // let wishlist_books = to_borrow_books.filter((to_borrow) => {
+    //   return !selected_books.includes(to_borrow.book_copy?.id);
+    // });
 
-    for (let i = 0; i < wishlist_books.length; i++) {
-      let wishlist_book = wishlist_books[i];
-      let formData = new FormData();
+    // for (let i = 0; i < wishlist_books.length; i++) {
+    //   let wishlist_book = wishlist_books[i];
+    //   let formData = new FormData();
 
-      formData.set("book_id", wishlist_book.book.id);
-      formData.set("member_id", borrower.id);
-      formData.set("wished_date", format(new Date(), "yyyy-MM-dd"));
+    //   formData.set("book_id", wishlist_book.book.id);
+    //   formData.set("member_id", borrower.id);
+    //   formData.set("wished_date", format(new Date(), "yyyy-MM-dd"));
 
-      await wishlistService.add(formData);
-    }
+    //   await wishlistService.add(formData);
+    // }
     // @ts-ignore
-    let queueNumber = document.querySelector("#queuing").value
+    let queueNumber = document.querySelector("#queuing").value;
 
-    await reserveService.deleteBy("number", queueNumber);
-    await queueService.delete(queueNumber);
+    if(queueNumber) {
+      await reserveService.deleteBy("number", queueNumber);
+      await queueService.delete(queueNumber);
+    }
 
     message = {
-      text: 'Successfully processed borrowed books.',
-      type: 'success',
+      text: "Successfully processed borrowed books.",
+      type: "success",
     };
 
     processing = false;
     to_borrow_books = [];
     borrower = null;
+
+    setTimeout(() => {
+      replace('/transact/borrow').then(() => {
+        window.location.reload();
+      });
+    }, 2000)
   };
 
   onMount(async () => {
-    let setting = await settingService.getOne('property', 'borrow_duration');
+    let setting = await settingService.getOne("property", "borrow_duration");
     borrow_duration = parseInt(setting.value);
+
+    let parsed = parse($querystring);
+
+    if (parsed?.queue_number) {
+      let queueTextbox = document.getElementById(`queuing`);
+      if (queueTextbox) {
+        // @ts-ignore
+        queueTextbox.value = parsed.queue_number;
+        const event = new KeyboardEvent("keyup", {
+          key: "Enter", // Key value for Enter key
+          code: "Enter", // Key code for Enter key
+          keyCode: 13, // Deprecated but still widely used
+          charCode: 13, // Deprecated but still widely used
+          which: 13, // Deprecated but still widely used
+          bubbles: true, // Whether the event bubbles up through the DOM
+          cancelable: true, // Whether the event is cancelable
+        });
+
+        queueTextbox.dispatchEvent(event);
+        replace('#/transact/borrow');
+      }
+    }
   });
+
+  let hiddenDrawer;
+  let transitionParams = {
+    x: -320,
+    duration: 200,
+    easing: sineIn
+  };
 </script>
 
 <Layout>
@@ -250,16 +283,26 @@
               <span class="block mb-2">Borrower Name:</span>
               <div class="flex items-center" style="height: 42px;">
                 {#if borrower}
-                  <Avatar class="inline-bloc me-2" rounded src={`${HOST}/static/uploads/${borrower.photo}`} />
-                  <span class="font-semibold text-lg uppercase">{borrower.last_name} {borrower.first_name} - {borrower.card_number} ({borrower.type})</span>
+                  <Avatar
+                    class="inline-bloc me-2"
+                    rounded
+                    src={`${HOST}/static/uploads/${borrower.photo}`}
+                  />
+                  <span class="font-semibold text-lg uppercase"
+                    >{borrower.last_name}
+                    {borrower.first_name} - {borrower.card_number} ({borrower.type})</span
+                  >
                 {/if}
               </div>
             </Label>
-            <Label class="mx-2 w-full">
+            <Label 
+              class="mx-2 w-full"
+            >
               <span class="block mb-2">Queue number:</span>
               <Input
                 disabled={processing}
                 id="queuing"
+                on:click={() => { hiddenDrawer = false; }}
                 placeholder="Enter or scan queue number."
                 on:keyup={handleQueuingKeyup}
               />
@@ -287,7 +330,6 @@
           </div>
         </Card>
       </section>
-
       <section class="books-section">
         <Table hoverable={true}>
           <TableHead>
@@ -295,7 +337,7 @@
               <Checkbox />
             </TableHeadCell>
             <TableHeadCell>Barcode</TableHeadCell>
-            <TableHeadCell>Book title</TableHeadCell>
+            <TableHeadCell>ISBN / title</TableHeadCell>
             <TableHeadCell>Publication Year</TableHeadCell>
             <TableHeadCell>Publisher</TableHeadCell>
             <TableHeadCell class="text-center">Action</TableHeadCell>
@@ -317,9 +359,12 @@
                 <TableBodyCell
                   >{to_borrow.book_copy?.barcode ?? ""}</TableBodyCell
                 >
-                <TableBodyCell>{to_borrow.book.title}</TableBodyCell>
+                <TableBodyCell title={to_borrow.book.title} class="overflow-hidden text-ellipsis" style="max-width: 200px;">
+                  <span class="text-xs text-gray-500">ISBN: {to_borrow.book.isbn}</span><br>
+                  {to_borrow.book.title}                
+                </TableBodyCell>
                 <TableBodyCell>{to_borrow.book.publication_year}</TableBodyCell>
-                <TableBodyCell>{to_borrow.publisher.name}</TableBodyCell>
+                <TableBodyCell>{to_borrow.book.publisher}</TableBodyCell>
                 <TableBodyCell>
                   {#if to_borrow.book_copy}
                     <Button
@@ -355,7 +400,45 @@
     </div>
   </main>
 
-  {#if message} 
+  <Drawer activateClickOutside={false} backdrop={false} transitionType="fly" {transitionParams} bind:hidden={hiddenDrawer}>
+    <div class="flex items-center">
+      <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+        <InfoCircleSolid class="w-5 h-5 me-2.5" />Reserved Books
+      </h5>
+      <CloseButton on:click={() => (hiddenDrawer = true)} class="mb-4 dark:text-white" />
+    </div>
+    <div class="w-full">
+      <Table striped={true}>
+        <TableHead>
+          <TableHeadCell class="text-center p-0" style="width: 40px;">
+            <CheckCircleOutline size="lg" class="inline-block"/>
+          </TableHeadCell>
+          <TableHeadCell>ISBN / BOOK TITLE</TableHeadCell>
+        </TableHead>
+        <TableBody>
+          {#each reserved_books as book}
+            <TableBodyRow>
+              <TableBodyCell class="text-center p-0" style="width: 40px;">
+                {#if to_borrow_books.filter(to_borrow => to_borrow.book.id == book.id).length}
+                  <CheckOutline size="lg" color="green" class="inline-block" />
+                {/if}
+              </TableBodyCell>
+              <TableBodyCell class="text-wrap">
+                <span class="text-gray-500">ISBN: {book.isbn}</span><br>
+                {book.title}
+              </TableBodyCell>
+            </TableBodyRow>          
+          {:else}
+            <TableBodyRow>
+              <TableBodyCell colspan={2} class="text-center">No books found.</TableBodyCell>
+            </TableBodyRow>
+          {/each}
+        </TableBody>
+      </Table>
+    </div>
+  </Drawer>
+
+  {#if message}
     <MessageModal open={true} {message} on:close={handleMessageClose} />
   {/if}
 </Layout>

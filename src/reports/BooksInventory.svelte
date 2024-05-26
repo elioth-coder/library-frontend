@@ -63,13 +63,13 @@
           <TableBody tableBodyClass="divide-y">
             {#await asyncItems}
               <TableBodyRow>
-                <TableBodyCell colspan={6} class="text-center">Generating report...</TableBodyCell>
+                <TableBodyCell colspan={7} class="text-center">Generating report...</TableBodyCell>
               </TableBodyRow>
             {/await}
             {#each filteredItems as item}
               <TableBodyRow>
                 <TableBodyCell>{item.isbn}</TableBodyCell>
-                <TableBodyCell>{item.title}</TableBodyCell>
+                <TableBodyCell class="overflow-hidden text-ellipsis" style="max-width: 230px;">{item.title}</TableBodyCell>
                 <TableBodyCell class="text-center">{item.available}</TableBodyCell>
                 <TableBodyCell class="text-center">{item.borrowed}</TableBodyCell>
                 <TableBodyCell class="text-center">{item.damaged}</TableBodyCell>

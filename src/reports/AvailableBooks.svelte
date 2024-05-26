@@ -94,7 +94,7 @@
             <TableBodyRow>
               <TableBodyCell class="text-center">{item.barcode}</TableBodyCell>
               <TableBodyCell class="text-center">{item.isbn}</TableBodyCell>
-              <TableBodyCell>{item.title}</TableBodyCell>
+              <TableBodyCell class="overflow-hidden text-ellipsis" style="max-width: 230px;">{item.title}</TableBodyCell>
               <TableBodyCell>{item.genre}</TableBodyCell>
             </TableBodyRow>
           {/each}
