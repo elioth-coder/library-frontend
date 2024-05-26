@@ -2,6 +2,7 @@
   import Layout from "../components/Layout.svelte";
   import Breadcrumb from "../components/Breadcrumb.svelte";
   import {
+  Button,
     Heading,
     TableBody,
     TableBodyCell,
@@ -38,6 +39,7 @@
       let copy = copies[i];
       let book = await bookService.get(copy.book_id);
       let availableBook = {
+        date_added: copy.date_added,
         barcode: copy.barcode,
         isbn: book.isbn,
         title: book.title,
@@ -70,16 +72,18 @@
   >
     <Breadcrumb {crumbs} />
     <div class="px-3">
-      <Heading tag="h4" class="text-center mb-4">List of Available Books</Heading>
+      <Heading tag="h4" class="text-center mb-4">
+        List of Available Books
+      </Heading>
       <TableSearch 
         hoverable={true}
         placeholder="Search book details"
         bind:inputValue={searchTerm}
       >
         <TableHead>
+          <TableHeadCell class="text-center">Date added</TableHeadCell>
           <TableHeadCell class="text-center">Barcode</TableHeadCell>
-          <TableHeadCell class="text-center">ISBN</TableHeadCell>
-          <TableHeadCell>Title</TableHeadCell>
+          <TableHeadCell>Book Title</TableHeadCell>
           <TableHeadCell>Genre</TableHeadCell>
         </TableHead>
         <TableBody tableBodyClass="divide-y">
@@ -92,9 +96,12 @@
           {/await}
           {#each filteredItems as item}
             <TableBodyRow>
+              <TableBodyCell class="text-center">{item.date_added}</TableBodyCell>
               <TableBodyCell class="text-center">{item.barcode}</TableBodyCell>
-              <TableBodyCell class="text-center">{item.isbn}</TableBodyCell>
-              <TableBodyCell class="overflow-hidden text-ellipsis" style="max-width: 230px;">{item.title}</TableBodyCell>
+              <TableBodyCell class="overflow-hidden text-ellipsis" style="max-width: 330px;">
+                <span class="text-gray-500">ISBN: {item.isbn}</span><br>
+                {item.title}
+              </TableBodyCell>
               <TableBodyCell>{item.genre}</TableBodyCell>
             </TableBodyRow>
           {/each}
@@ -102,8 +109,8 @@
         {#if items}
           <tfoot>
             <tr class="font-semibold text-gray-900 dark:text-white">
-              <th scope="row" colspan={3} class="py-3 px-6 text-base">
-                Total Available Books
+              <th scope="row" colspan={4} class="py-3 px-6 text-base">
+                Total Available Books:
                 {items.length}
               </th>
             </tr>

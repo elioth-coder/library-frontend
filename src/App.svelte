@@ -16,9 +16,11 @@
   import Wishlist from './pages/Wishlist.svelte';
   import Borrow from './pages/Borrow.svelte';
   import Settings from './settings/Settings.svelte';
+  import PrintBooksInventory from './print/BooksInventory.svelte';
   import BooksInventory from './reports/BooksInventory.svelte';
   import AvailableBooks from './reports/AvailableBooks.svelte';
   import BorrowedBooks from './reports/BorrowedBooks.svelte';
+  import ReturnedBooks from './reports/CollectedPenalties.svelte';
   import Pending from './members/Pending.svelte';
   import Approved from './members/Approved.svelte';
   import Rejected from './members/Rejected.svelte';
@@ -30,6 +32,7 @@
   import UserReturned from './user/Returned.svelte';
   import UserSearch from './user/Search.svelte';
   import UserWishlist from './user/Wishlist.svelte';
+  import StudentMembers from './reports/StudentMembers.svelte';
   
   const routes = {
     '/': Dashboard,
@@ -56,9 +59,13 @@
     '/members/approved': Approved,
     '/members/rejected': Rejected,
 
+    '/reports/student_members': StudentMembers,
     '/reports/books_inventory': BooksInventory,
     '/reports/books_available': AvailableBooks,
     '/reports/books_borrowed': BorrowedBooks,
+    '/reports/books_returned': ReturnedBooks,
+
+    '/print_report/books_inventory': PrintBooksInventory,
 
     '/queuing': Queuing,
     '/queuing/search': QueuingSearch,

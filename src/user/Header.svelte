@@ -6,7 +6,7 @@
 
   const dispatch = createEventDispatcher();
 </script>
-<header class="flex border-b p-3">
+<header class="flex border-b p-3 dark:border-b-gray-800 dark:text-gray-400 dark:bg-gray-800">
   <StackoverflowSolid size="xl" 
     class="cursor-pointer inline-block me-2" 
     on:click={() => replace('#/user')}

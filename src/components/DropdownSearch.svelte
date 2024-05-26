@@ -64,6 +64,7 @@
 
   {#if focused}
     <List
+      list="none"
       class="dark:border-gray-700 absolute top-full left-0 w-full bg-white border rounded shadow-md max-h-48 overflow-y-auto z-50"
     >
       {#each filteredOptions as option (option.value)}
@@ -73,7 +74,7 @@
           class="dark:border-gray-700 dark:hover:bg-gray-600 dark:bg-gray-800 dark:text-white p-2 cursor-pointer hover:bg-gray-100 border-b"
           on:click={() => handleSelection(option)}
         >
-          {option.text}
+          {@html option.text}
         </li>
       {:else}
         <li class="dark:bg-gray-800 dark:text-white p-2 border-b">

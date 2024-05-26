@@ -13,6 +13,7 @@
   import SettingService from "../services/SettingService";
   import { differenceInCalendarDays } from "date-fns";
   import { InfoCircleSolid } from "flowbite-svelte-icons";
+  import Footer from "./Footer.svelte";
 
   let hideDrawer = true;
   let decimal = Intl.NumberFormat('en-PH', {
@@ -87,13 +88,13 @@
   })
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col min-h-screen">
   <SidebarDrawer bind:hideDrawer={hideDrawer} />
   <Header on:hide-drawer={() => (hideDrawer = false)} />
   <section class="p-3 pb-0">
     <Breadcrumb {crumbs} />
   </section>
-  <main class="flex flex-col">
+  <main class="flex flex-col" style="height: calc(100vh - 300px);">
     <Heading tag="h4" class="text-center font-semibold mb-4">Borrowed Books</Heading>
     <div class="flex flex-col">
       <TableSearch
@@ -153,7 +154,7 @@
         </TableBody>
       </TableSearch>
     </div>
-    <section class="p-5">
+    <section class="p-3">
       <Alert border color="yellow">
         <InfoCircleSolid slot="icon" class="w-5 h-5" />
         <span class="font-medium">Note: </span>
@@ -161,4 +162,7 @@
       </Alert>
     </section>
   </main>
+  <section class="w-full mt-5 -mb-5">
+    <Footer />
+  </section>
 </div>

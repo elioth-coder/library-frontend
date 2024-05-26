@@ -7,6 +7,7 @@
   import MemberService from "../services/MemberService";
   import UserService from "../services/UserService";
   import { replace } from "svelte-spa-router";
+  import Footer from "./Footer.svelte";
 
   const { HOST } = CONFIG;
   let crumbs = [
@@ -32,13 +33,13 @@
   })
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col min-h-screen">
   <SidebarDrawer bind:hideDrawer={hideDrawer} />
   <Header on:hide-drawer={() => (hideDrawer = false)} />
   <section class="p-3 pb-0">
     <Breadcrumb {crumbs} />
   </section>
-  <main class="flex flex-col">
+  <main class="flex flex-col" style="min-height: calc(100vh - 300px);">
     <Heading tag="h4" class="text-center font-semibold mb-4">Profile</Heading>
     <div class="flex flex-col">
       {#if member}
@@ -110,4 +111,7 @@
       {/if}
     </div>
   </main>
+  <section class="w-full mt-5 -mb-5">
+    <Footer />
+  </section>
 </div>

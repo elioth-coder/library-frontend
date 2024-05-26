@@ -34,6 +34,7 @@
   import MessageModal from "../components/MessageModal.svelte";
   import QueueService from "../services/QueueService";
   import { sineIn } from "svelte/easing";
+  import BarcodeTextModal from "../components/BarcodeTextModal.svelte";
 
   let bookCopyService = new BookCopyService();
   let bookService = new BookService();
@@ -76,6 +77,15 @@
       if (!member) {
         message = {
           text: `Card number ${card_barcode} not found!`,
+          type: "error",
+        };
+
+        return;
+      }
+
+      if(member.status != 'Approved') {
+        message = {
+          text: `Card number valid, not yet approved.`,
           type: "error",
         };
 
@@ -235,6 +245,17 @@
     }, 2000)
   };
 
+  let need_borrower = true;
+  const pressEnterKeyEvent = new KeyboardEvent("keyup", {
+    key: "Enter", // Key value for Enter key
+    code: "Enter", // Key code for Enter key
+    keyCode: 13, // Deprecated but still widely used
+    charCode: 13, // Deprecated but still widely used
+    which: 13, // Deprecated but still widely used
+    bubbles: true, // Whether the event bubbles up through the DOM
+    cancelable: true, // Whether the event is cancelable
+  });
+
   onMount(async () => {
     let setting = await settingService.getOne("property", "borrow_duration");
     borrow_duration = parseInt(setting.value);
@@ -246,21 +267,18 @@
       if (queueTextbox) {
         // @ts-ignore
         queueTextbox.value = parsed.queue_number;
-        const event = new KeyboardEvent("keyup", {
-          key: "Enter", // Key value for Enter key
-          code: "Enter", // Key code for Enter key
-          keyCode: 13, // Deprecated but still widely used
-          charCode: 13, // Deprecated but still widely used
-          which: 13, // Deprecated but still widely used
-          bubbles: true, // Whether the event bubbles up through the DOM
-          cancelable: true, // Whether the event is cancelable
-        });
-
-        queueTextbox.dispatchEvent(event);
+        queueTextbox.dispatchEvent(pressEnterKeyEvent);
         replace('#/transact/borrow');
       }
     }
   });
+
+  const inputCardNumber = (card_number) => {
+    let cardNumberInput = document.getElementById('card_number');
+    // @ts-ignore
+    cardNumberInput.value = card_number;
+    cardNumberInput.dispatchEvent(pressEnterKeyEvent);
+  }
 
   let hiddenDrawer;
   let transitionParams = {
@@ -323,7 +341,7 @@
               <Input
                 disabled={processing}
                 on:keyup={handleCardBarcodeKeyup}
-                id="barcode_card_scanner"
+                id="card_number"
                 placeholder="Enter or scan student/card number"
               />
             </Label>
@@ -440,5 +458,12 @@
 
   {#if message}
     <MessageModal open={true} {message} on:close={handleMessageClose} />
+  {/if}
+
+  {#if need_borrower}
+    <BarcodeTextModal 
+      on:card-scan={({detail}) => { inputCardNumber(detail); }}
+      on:close={() => (need_borrower = false)} 
+    />
   {/if}
 </Layout>

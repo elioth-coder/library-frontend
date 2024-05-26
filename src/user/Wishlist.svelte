@@ -15,6 +15,7 @@
   import MessageModal from "../components/MessageModal.svelte";
   import { format } from "date-fns";
   import BookService from "../services/BookService";
+  import Footer from "./Footer.svelte";
 
   let crumbs = [
     {
@@ -118,13 +119,13 @@
   });
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col min-h-screen">
   <SidebarDrawer bind:hideDrawer={hideDrawer} />
   <Header on:hide-drawer={() => (hideDrawer = false)} />
   <section class="p-3 pb-0">
     <Breadcrumb {crumbs} />
   </section>
-  <main class="flex flex-col">
+  <main class="flex flex-col" style="height: calc(100vh - 300px);">
     <Heading tag="h4" class="text-center font-semibold mb-4">Books on Wishlist</Heading>
     <div class="flex flex-col">
       <TableSearch
@@ -171,7 +172,12 @@
       </TableSearch>
     </div>
   </main>
+
+  <section class="w-full mt-5 -mb-5">
+    <Footer />
+  </section>
 </div>
+
 
 <ConfirmationPopup
   {processing}

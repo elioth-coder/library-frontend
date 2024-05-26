@@ -27,8 +27,18 @@
   <Navbar {user} />
 </header>
 <div class="overflow-hidden lg:flex">
-  <Sidebar />
+  <div id="sidebar">
+    <Sidebar />
+  </div>
   <div class="relative h-full w-full overflow-y-auto lg:ml-64">
     <slot />
   </div>
 </div>
+
+<style>
+@media print {
+  header, #sidebar {
+    display: none !important;
+  }
+}
+</style>

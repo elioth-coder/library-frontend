@@ -14,14 +14,14 @@
   import { InfoCircleSolid, UserCircleOutline } from "flowbite-svelte-icons";
   import { onMount } from "svelte";
   export let site = {
-    name: "Library Management",
+    name: "NEUST Library",
     img: "/src/logo.png",
     link: "/",
     imgAlt: "Library Logo",
   };
   export let mainClass = "bg-gray-50 dark:bg-gray-900 w-full";
   export let mainDivClass =
-    "flex flex-col items-center justify-center px-6 mx-auto md:h-screen dark:bg-gray-900";
+    "flex flex-col items-center justify-center px-6 mx-auto h-screen dark:bg-gray-900";
   export let siteLinkClass =
     "flex items-center justify-center mb-1 text-2xl font-semibold dark:text-white";
   export let siteImgClass = "mr-4 h-11";

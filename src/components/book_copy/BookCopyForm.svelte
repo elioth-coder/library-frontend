@@ -34,7 +34,7 @@
 
     if(books.length) {
       book_options = books.map(
-        book => ({ value: book.id, text: book.title })
+        book => ({ value: book.id, text: `[ISBN: ${book.isbn}]<br>${book.title}` })
       );
     }
   });

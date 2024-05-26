@@ -15,6 +15,7 @@
   import MemberService from "../services/MemberService";
   import MessageModal from "../components/MessageModal.svelte";
   import { format } from "date-fns";
+  import Footer from "./Footer.svelte";
 
   let crumbs = [
     {
@@ -114,13 +115,13 @@
   });
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col min-h-screen">
   <SidebarDrawer bind:hideDrawer={hideDrawer} />
   <Header on:hide-drawer={() => (hideDrawer = false)} />
   <section class="p-3 pb-0">
     <Breadcrumb {crumbs} />
   </section>
-  <main class="flex flex-col">
+  <main class="flex flex-col" style="height: calc(100vh - 300px);">
     <Heading tag="h4" class="text-center font-semibold mb-4">Search books</Heading>
     <div class="flex flex-col">
       <TableSearch
@@ -160,11 +161,18 @@
                 {/if}
               </TableBodyCell>
             </TableBodyRow>
+          {:else}
+            <TableBodyRow>
+              <TableBodyCell colspan={2} class="text-center">No books found.</TableBodyCell>
+            </TableBodyRow>
           {/each}
         </TableBody>
       </TableSearch>
     </div>
   </main>
+  <section class="w-full mt-5 -mb-5">
+    <Footer />
+  </section>
 </div>
 
 <ConfirmationPopup

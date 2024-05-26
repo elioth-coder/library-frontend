@@ -16,16 +16,12 @@
     UsersGroupSolid,
     ArrowUpDownOutline,
     FileChartBarSolid,
-    ArrowDownToBracketOutline,
-    ArrowUpRightFromSquareOutline,
-    HeartOutline,
     CogOutline,
     DrawSquareOutline,
     OrdoredListOutline,
   } from "flowbite-svelte-icons";
   import { location, replace } from "svelte-spa-router";
   import UserService from "../services/UserService";
-  import currentUser from "../stores/CurrentUserStore";
 
   let drawerHidden: boolean = false;
 
@@ -40,13 +36,6 @@
 
   $: mainSidebarUrl = $location;
   $: activeMainSidebar = "#" + $location;
-
-  let links = [
-    { name: "Dashboard", icon: PieChartSolid, href: "#/" },
-    { name: "Borrowed", icon: ArrowUpRightFromSquareOutline, href: "#/student/borrowed" },
-    { name: "Returned", icon: ArrowDownToBracketOutline, href: "#/student/returned" },
-    { name: "On Wishlist", icon: HeartOutline, href: "#/student/wishlist" },
-  ];
 
   let posts = [
     { name: "Dashboard", icon: PieChartSolid, href: "#/" },
@@ -94,9 +83,11 @@
       icon: FileChartBarSolid,
       href: "#/reports",
       children: {
+        "Student Members": "#/reports/student_members",
         "Inventory of Books": "#/reports/books_inventory",
         "Available Books": "#/reports/books_available",
         "Borrowed Books": "#/reports/books_borrowed",
+        "Collected Penalties": "#/reports/books_returned",
       },
     },
     { name: "Entry Logger", icon: DrawSquareOutline, href: "#/entry_logger" },
@@ -136,9 +127,42 @@
     divClass="overflow-y-auto px-3 pt-20 lg:pt-4 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-4.5rem)] lg:block dark:bg-gray-800 lg:me-0 lg:sticky top-2"
   >
     <nav class="divide-y text-base font-medium">
-      {#if $currentUser?.role != "Admin"}
-        <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
-          {#each links as { name, icon, href } (name)}
+      <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
+        {#each posts as { name, icon, children, href } (name)}
+          {#if children}
+            <SidebarDropdownWrapper
+              isOpen={activeMainSidebar.indexOf(href?.toLowerCase()) >= 0}
+              label={name}
+              ulClass="mt-0.5"
+              btnClass="flex p-2 rounded-lg items-center justify-start gap-4 w-full text-base font-medium tracking-wide hover:text-primary-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+              spanClass="truncate"
+              class={dropdowns[name]
+                ? "text-primary-700 dark:text-white"
+                : "text-gray-500 dark:text-gray-400"}
+            >
+              <AngleDownOutline
+                slot="arrowdown"
+                class="ms-auto text-gray-800 dark:text-white"
+              />
+              <AngleUpOutline
+                slot="arrowup"
+                class="ms-auto text-gray-800 dark:text-white"
+              />
+              <svelte:component this={icon} slot="icon" />
+              {#each Object.entries(children) as [title, href]}
+                <SidebarItem
+                  label={title}
+                  {href}
+                  {spanClass}
+                  {activeClass}
+                  class={activeMainSidebar == href
+                    ? "text-primary-700 dark:text-primary-700"
+                    : ""}
+                  active={activeMainSidebar.indexOf(title.toLowerCase()) >= 0}
+                />
+              {/each}
+            </SidebarDropdownWrapper>
+          {:else}
             <SidebarItem
               label={name}
               {href}
@@ -148,59 +172,9 @@
             >
               <svelte:component this={icon} slot="icon" />
             </SidebarItem>
-          {/each}
-
-        </SidebarGroup>
-      {:else}
-        <SidebarGroup ulClass="list-unstyled fw-normal small mb-4 space-y-2">
-          {#each posts as { name, icon, children, href } (name)}
-            {#if children}
-              <SidebarDropdownWrapper
-                isOpen={activeMainSidebar.indexOf(href?.toLowerCase()) >= 0}
-                label={name}
-                ulClass="mt-0.5"
-                btnClass="flex p-2 rounded-lg items-center justify-start gap-4 w-full text-base font-medium tracking-wide hover:text-primary-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                spanClass="truncate"
-                class={dropdowns[name]
-                  ? "text-primary-700 dark:text-white"
-                  : "text-gray-500 dark:text-gray-400"}
-              >
-                <AngleDownOutline
-                  slot="arrowdown"
-                  class="ms-auto text-gray-800 dark:text-white"
-                />
-                <AngleUpOutline
-                  slot="arrowup"
-                  class="ms-auto text-gray-800 dark:text-white"
-                />
-                <svelte:component this={icon} slot="icon" />
-                {#each Object.entries(children) as [title, href]}
-                  <SidebarItem
-                    label={title}
-                    {href}
-                    {spanClass}
-                    {activeClass}
-                    class={activeMainSidebar == href
-                      ? "text-primary-700 dark:text-primary-700"
-                      : ""}
-                    active={activeMainSidebar.indexOf(title.toLowerCase()) >= 0}
-                  />
-                {/each}
-              </SidebarDropdownWrapper>
-            {:else}
-              <SidebarItem
-                label={name}
-                {href}
-                class={activeMainSidebar == href
-                  ? "text-primary-700 dark:text-primary-700"
-                  : ""}
-              >
-                <svelte:component this={icon} slot="icon" />
-              </SidebarItem>
-            {/if}
-          {/each}
-        </SidebarGroup>
-      {/if}
+          {/if}
+        {/each}
+      </SidebarGroup>
       <SidebarGroup ulClass="list-unstyled fw-normal small pt-4 space-y-2">
         <SidebarItem label="Log out" on:click={handleLogout}>
           <ArrowRightToBracketOutline slot="icon" />

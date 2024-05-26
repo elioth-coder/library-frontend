@@ -1,5 +1,5 @@
 <script>
-  import { Heading, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch } from "flowbite-svelte";
+  import {Heading, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch } from "flowbite-svelte";
   import SidebarDrawer from "./SidebarDrawer.svelte";
   import Header from "./Header.svelte";
   import Breadcrumb from "./Breadcrumb.svelte";
@@ -10,6 +10,7 @@
   import BorrowedService from "../services/BorrowedService";
   import BookService from "../services/BookService";
   import BookCopyService from "../services/BookCopyService";
+  import Footer from "./Footer.svelte";
 
   let decimal = Intl.NumberFormat('en-PH', {
       style: 'decimal',
@@ -82,13 +83,13 @@
   })
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col min-h-screen">
   <SidebarDrawer bind:hideDrawer={hideDrawer} />
   <Header on:hide-drawer={() => (hideDrawer = false)} />
   <section class="p-3 pb-0">
     <Breadcrumb {crumbs} />
   </section>
-  <main class="flex flex-col">
+  <main class="flex flex-col" style="height: calc(100vh - 300px);">
     <Heading tag="h4" class="text-center font-semibold mb-4">Returned Books</Heading>
     <div class="flex flex-col">
       <TableSearch
@@ -137,4 +138,8 @@
       </TableSearch>
     </div>
   </main>
+
+  <section class="w-full mt-5 -mb-5">
+    <Footer />
+  </section>
 </div>

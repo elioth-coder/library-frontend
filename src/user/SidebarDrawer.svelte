@@ -4,6 +4,7 @@
   import { sineIn } from "svelte/easing";
   import UserService from "../services/UserService";
   import { replace } from "svelte-spa-router";
+  import { onMount } from "svelte";
   export let hideDrawer = true;
 
   let userService = new UserService();
@@ -28,7 +29,7 @@
     easing: sineIn
   };
 
-  let icons = [
+  let links = [
     { name: 'Dashboard', icon: HomeOutline, href:'#/user' },
     { name: 'Search books', icon: SearchOutline, href:'#/user/search' },
     { name: 'Borrowed', icon: ArrowUpRightFromSquareOutline, href:'#/user/borrowed' },
@@ -36,6 +37,21 @@
     { name: 'My Wishlist', icon: HeartOutline, href:'#/user/wishlist' },
     { name: 'My Profile', icon: UserCircleOutline, href:'#/user/profile' },
   ];
+
+  let user;
+  let approved = false;
+
+  onMount(async ()=> {
+    user = await userService.me();
+    approved = (user.role=='Pending') ? false : true;
+
+    if(!approved) {
+      links = [
+        { name: 'Dashboard', icon: HomeOutline, href:'#/user' },
+        { name: 'My Profile', icon: UserCircleOutline, href:'#/user/profile' },
+      ]; 
+    }
+  })
 </script>
 
 <Drawer placement="right" transitionType="fly" {transitionParams} bind:hidden={hideDrawer} id="sidebar5">
@@ -46,7 +62,7 @@
     <CloseButton on:click={() => (hideDrawer = true)} class="mb-4 dark:text-white" />
   </div>
   <div class="flex flex-col py-3">
-    <Listgroup active items={icons} let:item class="w-full" on:click={console.log}>
+    <Listgroup active items={links} let:item class="w-full" on:click={console.log}>
       <svelte:component this={item.icon} class="w-6 h-6 me-2.5 inline-block"/>
       <span class="text-lg">{item.name}</span>
     </Listgroup>
