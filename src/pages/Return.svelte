@@ -219,6 +219,12 @@
       penalty = totalPenalties;
     } else {
       penalty = 0;
+      await processReturnedBooks();
+
+      message = {
+        text: 'Successfully processed returned books.',
+        type: 'success',
+      }
     }
   }
 
@@ -433,7 +439,7 @@
         </form>
         <svelte:fragment slot="footer">
           <section class="text-right w-full">
-            <Button on:click={() => { console.log('haha'); submitPenaltyButton.click(); }}>Process</Button>
+            <Button on:click={() => { submitPenaltyButton.click(); }}>Process</Button>
           </section>
         </svelte:fragment>
       </Modal>
