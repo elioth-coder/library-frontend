@@ -22,9 +22,9 @@ export let items;
     {#if items}
       {#each items as item, index}
         <TableBodyRow>
-          <TableBodyCell class="text-right w-16">{index + 1}.</TableBodyCell>
-          <TableBodyCell>{item.dt_logged}</TableBodyCell>
-          <TableBodyCell>
+          <TableBodyCell class="align-top text-right w-16">{index + 1}.</TableBodyCell>
+          <TableBodyCell class="align-top">{item.dt_logged}</TableBodyCell>
+          <TableBodyCell class="align-top">
             {#await item.member}
               Loading...
             {:then member}
@@ -32,7 +32,7 @@ export let items;
               ({member?.type ?? ""})
             {/await}
           </TableBodyCell>
-          <TableBodyCell>
+          <TableBodyCell class="align-top">
             {#await item.member}
               Loading...
             {:then member}
