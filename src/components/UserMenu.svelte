@@ -9,9 +9,9 @@
   } from "flowbite-svelte";
   import UserService from "../services/UserService";
   import { replace } from "svelte-spa-router";
+  import { ArrowRightToBracketOutline, ChartOutline, PieChartSolid } from "flowbite-svelte-icons";
 
-  export let name: string = "";
-  export let email: string = "";
+  export let user;
   let userService = new UserService();
 
   const handleLogout = async (e) => {
@@ -34,12 +34,20 @@
 </button>
 <Dropdown>
   <DropdownHeader>
-    <span class="block text-sm">{name}</span>
-    <span class="block truncate text-sm font-medium">{email}</span>
+    <span class="block text-sm">{user.name}</span>
+    <span class="block truncate text-sm font-medium">({user.role})</span>
   </DropdownHeader>
   <DropdownItem>
-    <A href="#/">Dashboard</A>
+    <A href="#/" class="flex">
+      <ChartOutline class="me-2" />
+      Dashboard
+    </A>
   </DropdownItem>
   <DropdownDivider />
-  <DropdownItem on:click={handleLogout}>Logout</DropdownItem>
+  <DropdownItem on:click={handleLogout}>
+    <section class="flex">
+      <ArrowRightToBracketOutline class="me-2" />
+      Logout  
+    </section>
+  </DropdownItem>
 </Dropdown>

@@ -88,6 +88,7 @@
         "Available Books": "#/reports/books_available",
         "Borrowed Books": "#/reports/books_borrowed",
         "Collected Penalties": "#/reports/books_returned",
+        "Entry Logs": "#/reports/entry_logs",
       },
     },
     { name: "Entry Logger", icon: DrawSquareOutline, href: "#/entry_logger" },

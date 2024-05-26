@@ -33,6 +33,8 @@
   import UserSearch from './user/Search.svelte';
   import UserWishlist from './user/Wishlist.svelte';
   import StudentMembers from './reports/StudentMembers.svelte';
+  import EntryLogs from './reports/EntryLogs.svelte';
+  import PrintEntryLogs from './print/EntryLogs.svelte';
   
   const routes = {
     '/': Dashboard,
@@ -64,8 +66,10 @@
     '/reports/books_available': AvailableBooks,
     '/reports/books_borrowed': BorrowedBooks,
     '/reports/books_returned': ReturnedBooks,
+    '/reports/entry_logs': EntryLogs,
 
     '/print_report/books_inventory': PrintBooksInventory,
+    '/print_report/entry_logs': PrintEntryLogs,
 
     '/queuing': Queuing,
     '/queuing/search': QueuingSearch,

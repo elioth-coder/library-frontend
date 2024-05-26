@@ -25,6 +25,6 @@
 	<div class="ms-auto flex items-center gap-2 p-1">
 		<!-- <AppsMenu /> -->
 		<DarkMode />
-		<UserMenu />
+		<UserMenu {user} />
 	</div>
 </Navbar>

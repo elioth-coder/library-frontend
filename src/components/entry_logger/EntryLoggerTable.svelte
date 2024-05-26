@@ -28,14 +28,15 @@ export let items;
             {#await item.member}
               Loading...
             {:then member}
-              {`${member?.first_name ?? ""} ${member?.last_name ?? ""}`}
+              {`${member?.first_name ?? ""} ${member?.last_name ?? ""}`}<br>
+              ({member?.type ?? ""})
             {/await}
           </TableBodyCell>
           <TableBodyCell>
             {#await item.member}
               Loading...
             {:then member}
-              {member?.course ?? ""}
+              {(member.type=='Student') ? `${member.course} ${member.year_level}` : "N/A"}
             {/await}
           </TableBodyCell>
         </TableBodyRow>
