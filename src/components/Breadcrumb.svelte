@@ -9,7 +9,7 @@
 </script>
 
 <Breadcrumb class="mb-5">
-  <BreadcrumbItem href="#/">Dashboard</BreadcrumbItem>
+  <BreadcrumbItem href="#/">Home</BreadcrumbItem>
   {#each crumbs as crumb}
     <BreadcrumbItem href={crumb.href}>{crumb.title}</BreadcrumbItem>
   {/each}

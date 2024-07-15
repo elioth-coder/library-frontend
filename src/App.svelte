@@ -1,6 +1,6 @@
 <script>
   import Router from 'svelte-spa-router';
-  import Dashboard from './pages/Dashboard.svelte';
+  import ReportsDashboard from './reports/ReportsDashboard.svelte';
   import Book from './pages/Book.svelte';
   import NotFound from './pages/NotFound.svelte';
   import BookCopy from './pages/BookCopy.svelte';
@@ -19,7 +19,7 @@
   import PrintBooksInventory from './print/BooksInventory.svelte';
   import BooksInventory from './reports/BooksInventory.svelte';
   import AvailableBooks from './reports/AvailableBooks.svelte';
-  import BorrowedBooks from './reports/BorrowedBooks.svelte';
+  import BooksBorrowed from './reports/BooksBorrowed.svelte';
   import ReturnedBooks from './reports/CollectedPenalties.svelte';
   import Pending from './members/Pending.svelte';
   import Approved from './members/Approved.svelte';
@@ -32,12 +32,11 @@
   import UserReturned from './user/Returned.svelte';
   import UserSearch from './user/Search.svelte';
   import UserWishlist from './user/Wishlist.svelte';
-  import StudentMembers from './reports/StudentMembers.svelte';
-  import EntryLogs from './reports/EntryLogs.svelte';
+  import ListMembers from './reports/ListMembers.svelte';
+  import LogsEntry from './reports/LogsEntry.svelte';
   import PrintEntryLogs from './print/EntryLogs.svelte';
   
   const routes = {
-    '/': Dashboard,
     '/manage_queuing': QueuingNumber,
     '/entry_logger': EntryLogger,
     '/transact/borrow': Borrow, 
@@ -61,12 +60,14 @@
     '/members/approved': Approved,
     '/members/rejected': Rejected,
 
-    '/reports/student_members': StudentMembers,
-    '/reports/books_inventory': BooksInventory,
+    '/report': ReportsDashboard,
+    '/report/member': ListMembers,
+    '/report/book_inventory': BooksInventory,
+    '/report/book_borrowed': BooksBorrowed,
+    '/report/log_entry': LogsEntry,
+
     '/reports/books_available': AvailableBooks,
-    '/reports/books_borrowed': BorrowedBooks,
     '/reports/books_returned': ReturnedBooks,
-    '/reports/entry_logs': EntryLogs,
 
     '/print_report/books_inventory': PrintBooksInventory,
     '/print_report/entry_logs': PrintEntryLogs,

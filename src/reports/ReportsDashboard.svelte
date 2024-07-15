@@ -11,7 +11,12 @@
 
   let dashboardService = new DashboardService();
   let userService = new UserService();
-  let crumbs = [];
+  let crumbs = [
+    {
+      href: "#/report",
+      title: "Reports",
+    },    
+  ];
   let booksPieChartContainer, visitorsLineChartContainer;
   let borrowed = 0,
     missing = 0,

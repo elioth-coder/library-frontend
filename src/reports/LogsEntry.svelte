@@ -19,11 +19,11 @@
 
   let crumbs = [
     {
-      href: "#/reports",
+      href: "#/report",
       title: "Reports",
     },
     {
-      href: "#/entry_logs",
+      href: "#/report/log_entry",
       title: "Entry Logs",
     },
   ];

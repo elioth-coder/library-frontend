@@ -17,11 +17,11 @@
 
   let crumbs = [
     {
-      href: "#/reports",
+      href: "#/report",
       title: "Reports",
     },
     {
-      href: "#/books_inventory",
+      href: "#/report/book_inventory",
       title: "Inventory of Books",
     },
   ];
@@ -47,10 +47,10 @@
   >
     <Breadcrumb {crumbs} />
     <div class="px-3">
-      <Heading tag="h4" class="text-center mb-4">
-        Inventory of Books
+      <Heading tag="h4" class="text-center mb-4 relative">
+        Books - Inventory
         <a href="#/print_report/books_inventory" target="_blank">
-          <Button size="xs" color="dark" class="float-right" outline>
+          <Button size="xs" color="dark" class="absolute right-0 top-1/2 -mt-4" outline>
             <PrinterOutline class="me-1"/>
             Print
           </Button>

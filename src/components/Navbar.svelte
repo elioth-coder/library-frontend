@@ -9,14 +9,15 @@
 
 <Navbar {fluid} color="default">
 	<div class="flex w-fit items-center justify-start">
-		<NavHamburger />
 		<NavBrand href="/" class="ms-2 md:me-24">
-			<img
-				src="/src/logo.png"
-				class="me-3 h-6 sm:h-8"
-				alt="Stacked books"
-			/>
-			<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl">
+			<section class="h-full min-w-14">
+				<img
+					src="/src/logo.png"
+					class="h-8"
+					alt="Stacked books"
+				/>
+			</section>
+			<span class="self-center whitespace-nowrap text-2xl font-bold dark:text-white sm:text-2xl text-black">
 				NEUST Library Management
 			</span>
 		</NavBrand>

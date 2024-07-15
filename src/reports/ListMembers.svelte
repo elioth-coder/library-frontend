@@ -16,12 +16,12 @@
 
   let crumbs = [
     {
-      href: "#/reports",
+      href: "#/report",
       title: "Reports",
     },
     {
-      href: "#/student_members",
-      title: "Student Members",
+      href: "#/report/member",
+      title: "List of Members",
     },
   ];
   let memberService = new MemberService();
@@ -30,7 +30,6 @@
 
   const getMembers = async () => {
     let members = await memberService.getBy('status', 'Approved');
-    members = members.filter(member => member.type=='Student');
 
     return sortBy(members, (member) => member.last_name);
   };
@@ -56,7 +55,7 @@
     <Breadcrumb {crumbs} />
     <div class="px-3">
       <Heading tag="h4" class="text-center mb-4">
-        List of Student Members
+        Members
       </Heading>
       <TableSearch 
         hoverable={true}

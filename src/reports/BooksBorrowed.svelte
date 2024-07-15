@@ -19,11 +19,11 @@
 
   let crumbs = [
     {
-      href: "#/reports",
+      href: "#/report",
       title: "Reports",
     },
     {
-      href: "#/books_inventory",
+      href: "#/report/book_borrowed",
       title: "Borrowed Books",
     },
   ];
@@ -85,7 +85,7 @@
     <Breadcrumb {crumbs} />
     <div class="px-3">
       <Heading tag="h4" class="text-center mb-4"
-        >List of Borrowed Books</Heading
+        >Books - Borrowed</Heading
       >
       <TableSearch
         hoverable={true}
